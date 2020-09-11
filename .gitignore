@@ -12,9 +12,13 @@ pom.xml.versionsBackup
 language.settings.xml
 target
 
-# Eclipse CDT
+# Eclipse
+/eclipse
 .metadata
 .recommenders
+/swtchart/.classpath
+/swtchart/.project
+/swtchart/.settings/
 
 # Dolphin browser
 .directory
