@@ -28,7 +28,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swtchart.Chart;
@@ -46,7 +46,7 @@ import org.eclipse.swtchart.internal.series.SeriesSet;
 /**
  * Plot area to draw series and grids.
  */
-public class PlotArea extends Composite implements PaintListener, IPlotArea {
+public class PlotArea extends Canvas implements PaintListener, IPlotArea {
 
 	/** the chart */
 	private Chart chart;

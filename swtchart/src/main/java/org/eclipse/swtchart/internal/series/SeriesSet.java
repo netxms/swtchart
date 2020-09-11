@@ -362,12 +362,14 @@ public class SeriesSet implements ISeriesSet {
 		int stackRiserPosition = -1;
 		double[] stackBarSeries = null;
 		double[] stackLineSeries = null;
+      double[] invertedStackLineSeries = null;
 		if(((Axis)xAxis).isValidCategoryAxis()) {
 			String[] categorySeries = xAxis.getCategorySeries();
 			if(categorySeries != null) {
 				int size = categorySeries.length;
 				stackBarSeries = new double[size];
 				stackLineSeries = new double[size];
+            invertedStackLineSeries = new double[size];
 			}
 		}
 		for(ISeries<?> series : getSeries()) {
@@ -383,7 +385,7 @@ public class SeriesSet implements ISeriesSet {
 					((BarSeries<?>)series).setRiserIndex(((Axis)xAxis).getNumRisers() + stackRiserPosition);
 					setStackSeries(stackBarSeries, series);
 				} else if(series.getType() == SeriesType.LINE) {
-					setStackSeries(stackLineSeries, series);
+					setStackSeries(series.isInverted() ? invertedStackLineSeries : stackLineSeries, series);
 				}
 			} else {
 				if(series.getType() == SeriesType.BAR) {

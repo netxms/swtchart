@@ -68,6 +68,8 @@ abstract public class Series<T> implements ISeries<T> {
 	protected boolean stackEnabled;
 	/** the stack series */
 	protected double[] stackSeries;
+   /** the state indicating if the series is inverted */
+   protected boolean inverted;
 	/** the state indicating if the series is visible in legend */
 	private boolean visibleInLegend;
 	/** the series description */
@@ -95,6 +97,7 @@ abstract public class Series<T> implements ISeries<T> {
 		visibleBufferStatus = false;
 		type = DEFAULT_SERIES_TYPE;
 		stackEnabled = false;
+      inverted = false;
 		// isXMonotoneIncreasing = true;
 		seriesLabel = new SeriesLabel();
 		xErrorBar = new ErrorBar();
@@ -149,6 +152,24 @@ abstract public class Series<T> implements ISeries<T> {
 		return stackEnabled;
 	}
 
+   /**
+    * @see org.eclipse.swtchart.ISeries#setInverted(boolean)
+    */
+   @Override
+   public void setInverted(boolean inverted)
+   {
+      this.inverted = inverted;
+   }
+
+   /**
+    * @see org.eclipse.swtchart.ISeries#isInverted()
+    */
+   @Override
+   public boolean isInverted()
+   {
+      return inverted;
+   }
+	
 	@Override
 	public CartesianSeriesModel<T> getDataModel() {
 
@@ -338,7 +359,7 @@ abstract public class Series<T> implements ISeries<T> {
 				}
 			}
 		}
-		return new Range(min, max);
+      return inverted ? new Range(-max, -min) : new Range(min, max);
 	}
 
 	/**
@@ -589,4 +610,14 @@ abstract public class Series<T> implements ISeries<T> {
 	 *            the y axis
 	 */
 	abstract protected void draw(GC gc, int width, int height, Axis xAxis, Axis yAxis);
+
+   /**
+    * @see org.eclipse.swtchart.ISeries#getSize()
+    */
+   @Override
+   public int getSize()
+   {
+      Object dataModel = getDataModel();
+      return (dataModel instanceof DoubleArraySeriesModel) ? ((DoubleArraySeriesModel)dataModel).size() : 0;
+   }
 }

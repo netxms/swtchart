@@ -14,7 +14,9 @@
  *******************************************************************************/
 package org.eclipse.swtchart;
 
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
+import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
@@ -125,10 +127,45 @@ public interface IPlotArea {
 	 */
 	public void setToolTipText(String tootlTipText);
 
+   /**
+    * Register a listener that is notified about mouse actions
+    * 
+    * @param mouseListener
+    */
+   public void addMouseListener(MouseListener mouseListener);
+
+   /**
+    * Unregister a listener that is notified about mouse actions
+    * 
+    * @param mouseListener
+    */
+   public void removeMouseListener(MouseListener mouseListener);
+
 	/**
-	 * Register a listener that is notified about mous moves
+	 * Register a listener that is notified about mouse moves
 	 * 
 	 * @param mouseMoveListener
 	 */
 	public void addMouseMoveListener(MouseMoveListener mouseMoveListener);
+
+   /**
+    * Unregister a listener that is notified about mouse moves
+    * 
+    * @param mouseMoveListener
+    */
+   public void removeMouseMoveListener(MouseMoveListener mouseMoveListener);
+
+   /**
+    * Register a listener that is notified about mouse enter/leave
+    * 
+    * @param mouseTrackListener
+    */
+   public void addMouseTrackListener(MouseTrackListener mouseTrackListener);
+
+   /**
+    * Unregister a listener that is notified about mouse enter/leave
+    * 
+    * @param mouseTrackListener
+    */
+   public void removeMouseTrackListener(MouseTrackListener mouseTrackListener);
 }

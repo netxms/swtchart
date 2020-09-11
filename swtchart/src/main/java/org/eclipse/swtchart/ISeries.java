@@ -114,6 +114,20 @@ public interface ISeries<DataType> {
 	 */
 	boolean isStackEnabled();
 
+   /**
+    * Set inverted mode
+    * 
+    * @param inverted
+    */
+   void setInverted(boolean inverted);
+   
+   /**
+    * Get inverted mode state
+    * 
+    * @return
+    */
+   boolean isInverted();
+	
 	/**
 	 * This is a legacy/convenient method to create series.
 	 * Sets the X series.
@@ -266,6 +280,13 @@ public interface ISeries<DataType> {
 	 * @return the pixel coordinates
 	 */
 	Point getPixelCoordinates(int index);
+
+	/**
+	 * Get series size
+	 * 
+	 * @return series size
+	 */
+	int getSize();
 
 	/**
 	 * Adds the dispose listener. The newly created color or font for series can be

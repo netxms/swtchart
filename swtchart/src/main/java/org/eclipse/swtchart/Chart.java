@@ -27,6 +27,7 @@ import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Transform;
+import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -46,6 +47,8 @@ import org.eclipse.swtchart.internal.series.SeriesSet;
  */
 public class Chart extends Composite implements Listener {
 
+	/** translucent areas flag */
+	protected boolean translucent = true;
 	/** the title */
 	private final Title title;
 	/** the legend */
@@ -144,6 +147,16 @@ public class Chart extends Composite implements Listener {
 
 		return plotArea;
 	}
+	
+	/**
+	 * Gets the plot area.
+	 * 
+	 * @return the plot area
+	 */
+	public Canvas getPlotAreaControl()
+	{
+		return (Canvas)plotArea;
+	}
 
 	public void setPlotArea(IPlotArea area) {
 
@@ -161,6 +174,17 @@ public class Chart extends Composite implements Listener {
 		return seriesSet;
 	}
 
+   /**
+    * Update stack and riser data
+    */
+   protected void updateStackAndRiserData()
+   {
+      seriesSet.updateStackAndRiserData();
+   }
+
+	/**
+	 * @see org.eclipse.swt.widgets.Control#setBackground(org.eclipse.swt.graphics.Color)
+	 */
 	@Override
 	public void setBackground(Color color) {
 
@@ -258,6 +282,22 @@ public class Chart extends Composite implements Listener {
 		return compressEnabled;
 	}
 
+   /**
+    * @return the translucent
+    */
+   public boolean isTranslucent()
+   {
+      return translucent;
+   }
+
+   /**
+    * @param translucent the translucent to set
+    */
+   public void setTranslucent(boolean translucent)
+   {
+      this.translucent = translucent;
+   }
+	
 	/**
 	 * Suspends the update of chart appearance.
 	 * 
