@@ -65,6 +65,26 @@ public interface CartesianSeriesModel<T> extends SeriesModel<T> {
 
 		return StreamSupport.stream(this.spliterator(), false).filter(v -> getY(v) != null).map(v -> getY(v)).min(DEFAULT_NUMBER_COMPARATOR).get();
 	}
+	
+	/**
+	 * Get average value for Y series
+	 *
+	 * @return average value for Y series
+	 */
+	default Number getAvgY()
+	{
+	   return 0;  // FIXME: add default implementation
+	}
+
+   /**
+    * Get current (first in series) value for Y series
+    *
+    * @return current value for Y series
+    */
+   default Number getCurrY()
+   {
+      return 0;  // FIXME: add default implementation
+   }
 
 	/**
 	 * 

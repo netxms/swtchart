@@ -620,4 +620,36 @@ abstract public class Series<T> implements ISeries<T> {
       Object dataModel = getDataModel();
       return (dataModel instanceof DoubleArraySeriesModel) ? ((DoubleArraySeriesModel)dataModel).size() : 0;
    }
+
+   /**
+    * @return the minY
+    */
+   public double getMinY()
+   {
+      return getDataModel().getMinY().doubleValue();
+   }
+
+   /**
+    * @return the maxY
+    */
+   public double getMaxY()
+   {
+      return getDataModel().getMaxY().doubleValue();
+   }
+
+   /**
+    * @return the avgY
+    */
+   public double getAvgY()
+   {
+      return getDataModel().getAvgY().doubleValue();
+   }
+
+   /**
+    * @return current Y value
+    */
+   public double getCurY()
+   {
+      return getDataModel().getCurrY().doubleValue();
+   }
 }

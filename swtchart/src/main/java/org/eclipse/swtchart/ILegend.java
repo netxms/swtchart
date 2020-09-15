@@ -118,4 +118,18 @@ public interface ILegend {
 	 * @return the rectangle associated with the given series id in pixels.
 	 */
 	Rectangle getBounds(String seriesId);
+
+   /**
+    * Check if legend is in extended mode.
+    *
+    * @return true if legend is in extended mode
+    */
+   public boolean isExtended();
+
+   /**
+    * Set extended mode for legend.
+    *
+    * @param extended true to turn on extended mode
+    */
+   public void setExtended(boolean extended);
 }

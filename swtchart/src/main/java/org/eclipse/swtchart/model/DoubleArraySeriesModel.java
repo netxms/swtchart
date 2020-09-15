@@ -29,6 +29,7 @@ public class DoubleArraySeriesModel implements IndexedSeriesModel<Integer>, Cart
 	private boolean isXMonotoneIncreasing = true;
 	private final double minY;
 	private final double maxY;
+	private final double avgY;
 
 	public DoubleArraySeriesModel(double[] xSeries, double[] ySeries) {
 		if(xSeries.length != ySeries.length) {
@@ -60,6 +61,7 @@ public class DoubleArraySeriesModel implements IndexedSeriesModel<Integer>, Cart
 			// find the min and max value of y series
 			double minY = ySeries[0];
 			double maxY = ySeries[0];
+	      double sum = ySeries[0];
 			for(int i = 1; i < ySeries.length; i++) {
 				if(minY > ySeries[i]) {
 					minY = ySeries[i];
@@ -67,12 +69,15 @@ public class DoubleArraySeriesModel implements IndexedSeriesModel<Integer>, Cart
 				if(maxY < ySeries[i]) {
 					maxY = ySeries[i];
 				}
+				sum += ySeries[i];
 			}
 			this.minY = minY;
 			this.maxY = maxY;
+			this.avgY = sum / ySeries.length;
 		} else {
 			this.minY = 0;
 			this.maxY = 0;
+			this.avgY = 0;
 		}
 	}
 
@@ -144,4 +149,16 @@ public class DoubleArraySeriesModel implements IndexedSeriesModel<Integer>, Cart
 
 		return minY;
 	}
+		
+   @Override
+   public Number getAvgY() {
+
+      return avgY;
+   }
+   
+   @Override
+   public Number getCurrY() {
+   
+      return ydata.length > 0 ? ydata[0] : 0;
+   }
 }

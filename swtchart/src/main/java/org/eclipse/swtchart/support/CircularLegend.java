@@ -108,6 +108,24 @@ public class CircularLegend extends Composite implements ILegend, PaintListener 
 		return visible;
 	}
 
+   /**
+    * @see org.eclipse.swtchart.ILegend#isExtended()
+    */
+   @Override
+   public boolean isExtended()
+   {
+      return false;
+   }
+
+   /**
+    * @see org.eclipse.swtchart.ILegend#setExtended(boolean)
+    */
+   @Override
+   public void setExtended(boolean extended)
+   {
+      // do nothing - extended mode not supported for this legend type
+   }
+
 	@Override
 	public void setFont(Font font) {
 

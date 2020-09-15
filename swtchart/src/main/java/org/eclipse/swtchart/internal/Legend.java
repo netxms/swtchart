@@ -25,6 +25,7 @@ import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
@@ -42,7 +43,10 @@ import org.eclipse.swtchart.internal.series.Series;
 /**
  * A legend for chart.
  */
-public class Legend extends Composite implements ILegend, PaintListener {
+public class Legend extends Composite implements ILegend, PaintListener
+{
+   private static final String HEADER_ID = "$$header$$";
+   private static final String VALUE_PLACEHOLDER = "000.000 M";
 
 	/** the plot chart */
 	private Chart chart;
@@ -52,6 +56,8 @@ public class Legend extends Composite implements ILegend, PaintListener {
 	private int position;
 	/** the margin */
 	private static final int MARGIN = 5;
+   /** the margin for extended info columns */
+   private static final int EXT_COL_MARGIN = 7;
 	/** the width of area to draw symbol */
 	private static final int SYMBOL_WIDTH = 20;
 	/** the line width */
@@ -65,9 +71,15 @@ public class Legend extends Composite implements ILegend, PaintListener {
 	/** the default font size */
 	private static final int DEFAULT_FONT_SIZE = Constants.SMALL_FONT_SIZE;
 	/** the default position */
-	private static final int DEFAULT_POSITION = SWT.RIGHT;
+	private static final int DEFAULT_POSITION = SWT.BOTTOM;
 	/** the map between series id and cell bounds */
 	private Map<String, Rectangle> cellBounds;
+   /** offset for drawing extended info */
+   private int extendedInfoOffset = 0;
+   /** extended legend flag */
+   private boolean extended = true;
+   /** font used for column headers */
+   private Font headerFont = null;
 
 	/**
 	 * Constructor.
@@ -107,6 +119,37 @@ public class Legend extends Composite implements ILegend, PaintListener {
 		return visible;
 	}
 
+   /**
+    * @see org.eclipse.swtchart.ILegend#isExtended()
+    */
+   @Override
+   public boolean isExtended()
+   {
+      return extended;
+   }
+
+   /**
+    * @see org.eclipse.swtchart.ILegend#setExtended(boolean)
+    */
+   @Override
+   public void setExtended(boolean extended)
+   {
+      this.extended = extended;
+   }
+
+   /**
+    * Update header font
+    */
+   private void updateHeaderFont()
+   {
+      if (headerFont != null)
+         headerFont.dispose();
+      
+      FontData fd = getFont().getFontData()[0];
+      fd.setStyle(SWT.BOLD);
+      headerFont = new Font(getDisplay(), fd);
+   }
+   
 	@Override
 	public void setFont(Font font) {
 
@@ -115,6 +158,7 @@ public class Legend extends Composite implements ILegend, PaintListener {
 		} else {
 			super.setFont(font);
 		}
+      updateHeaderFont();
 		chart.updateLayout();
 	}
 
@@ -252,28 +296,36 @@ public class Legend extends Composite implements ILegend, PaintListener {
 	/**
 	 * Update the layout data.
 	 */
-	public void updateLayoutData() {
-
-		if(!visible) {
+	public void updateLayoutData()
+	{
+		if (!visible)
+		{
 			setLayoutData(new ChartLayoutData(0, 0));
 			return;
 		}
+		
+      extendedInfoOffset = 0;
+
 		int width = 0;
 		int height = 0;
+		
 		ISeries<?>[] seriesArray = sort(chart.getSeriesSet().getSeries());
 		Rectangle r = chart.getClientArea();
 		Rectangle titleBounds = ((Title)chart.getTitle()).getBounds();
 		int titleHeight = titleBounds.y + titleBounds.height;
 		int cellHeight = Util.getExtentInGC(getFont(), null).y;
+      final int cellExtraWidth = extended ? (Util.getExtentInGC(getFont(), VALUE_PLACEHOLDER).x + EXT_COL_MARGIN) * 4 : 0;
+
 		if(position == SWT.RIGHT || position == SWT.LEFT) {
 			int columns = 1;
-			int yPosition = MARGIN;
+         int yPosition = extended ? (cellHeight + MARGIN * 2) : MARGIN;
 			int maxCellWidth = 0;
 			for(ISeries<?> series : seriesArray) {
 				if(!series.isVisibleInLegend()) {
 					continue;
 				}
-				if(series instanceof ICircularSeries) {
+				if (series instanceof ICircularSeries)
+				{
 					if(((ICircularSeries<?>)series).getLabels() != null) {
 						String[] labels = ((ICircularSeries<?>)series).getLabels();
 						for(int i = 0; i != labels.length; i++) {
@@ -293,10 +345,15 @@ public class Legend extends Composite implements ILegend, PaintListener {
 						continue;
 					}
 				}
+
 				String label = getLegendLabel(series);
 				int textWidth = Util.getExtentInGC(getFont(), label).x;
 				int cellWidth = textWidth + SYMBOL_WIDTH + MARGIN * 3;
 				maxCellWidth = Math.max(maxCellWidth, cellWidth);
+            if (extendedInfoOffset < cellWidth + EXT_COL_MARGIN)
+            {
+               extendedInfoOffset = cellWidth + EXT_COL_MARGIN;
+            }
 				if(yPosition + cellHeight < r.height - titleHeight - MARGIN || yPosition == MARGIN) {
 					yPosition += cellHeight + MARGIN;
 				} else {
@@ -314,7 +371,8 @@ public class Legend extends Composite implements ILegend, PaintListener {
 				if(!series.isVisibleInLegend()) {
 					continue;
 				}
-				if(series instanceof ICircularSeries) {
+				if(series instanceof ICircularSeries)
+				{
 					if(((ICircularSeries<?>)series).getLabels() != null) {
 						String[] labels = ((ICircularSeries<?>)series).getLabels();
 						for(int i = 0; i != labels.length; i++) {
@@ -336,18 +394,42 @@ public class Legend extends Composite implements ILegend, PaintListener {
 				String label = getLegendLabel(series);
 				int textWidth = Util.getExtentInGC(getFont(), label).x;
 				int cellWidth = textWidth + SYMBOL_WIDTH + MARGIN * 3;
-				if(xPosition + cellWidth < r.width || xPosition == 0) {
+				if (!extended && (xPosition + cellWidth < r.width || xPosition == 0))
+				{
 					xPosition += cellWidth;
-				} else {
+				} 
+				else
+				{
 					rows++;
 					xPosition = cellWidth;
 				}
 				cellBounds.put(series.getId(), new Rectangle(xPosition - cellWidth, (cellHeight + MARGIN) * (rows - 1) + MARGIN, cellWidth, cellHeight));
 				width = Math.max(xPosition, width);
+            if (extendedInfoOffset < cellWidth + EXT_COL_MARGIN)
+            {
+               extendedInfoOffset = cellWidth + EXT_COL_MARGIN;
+            }
 			}
 			height = (cellHeight + MARGIN) * rows + MARGIN;
 		}
-		setLayoutData(new ChartLayoutData(width, height));
+
+      if (extended)
+      {
+         width += cellExtraWidth;
+         height += cellHeight + MARGIN; 
+         cellBounds.put(HEADER_ID, new Rectangle(0, MARGIN, cellExtraWidth, cellHeight));
+         
+         // Update all cells because right border could be set incorrectly if
+         // extendedInfoOffset was updated multiple times during calculation
+         for(Entry<String, Rectangle> e : cellBounds.entrySet())
+         {
+            if (e.getKey().equals(HEADER_ID))
+               continue;
+            e.getValue().width = width;
+         }
+      }
+      
+      setLayoutData(new ChartLayoutData(width, height));
 	}
 
 	/**
@@ -409,6 +491,33 @@ public class Legend extends Composite implements ILegend, PaintListener {
 		}
 	}
 
+   /**
+    * Draw extended info (min, max, average value)
+    * 
+    * @param gc
+    * @param series
+    * @param r
+    */
+   private void drawExtendedInfo(GC gc, Series<?> series, Rectangle r)
+   {
+      int shift = Util.getExtentInGC(getFont(), VALUE_PLACEHOLDER).x + EXT_COL_MARGIN;
+      int x = r.x + extendedInfoOffset + MARGIN * 2;
+      
+      gc.drawText(chart.isUseMultipliers() ? DataFormatter.roundDecimalValue(series.getCurY(), 0.005, 3) : Double.toString(series.getCurY()), x, r.y, true);
+      x += shift;
+
+      gc.drawText(chart.isUseMultipliers() ? DataFormatter.roundDecimalValue(series.getMinY(), 0.005, 3) : Double.toString(series.getMinY()), x, r.y, true);
+      x += shift;
+
+      gc.drawText(chart.isUseMultipliers() ? DataFormatter.roundDecimalValue(series.getAvgY(), 0.005, 3) : Double.toString(series.getAvgY()), x, r.y, true);
+      x += shift;
+
+      gc.drawText(chart.isUseMultipliers() ? DataFormatter.roundDecimalValue(series.getMaxY(), 0.005, 3) : Double.toString(series.getMaxY()), x, r.y, true);
+   }
+
+	/**
+	 * @see org.eclipse.swt.events.PaintListener#paintControl(org.eclipse.swt.events.PaintEvent)
+	 */
 	@Override
 	public void paintControl(PaintEvent e) {
 
@@ -427,13 +536,41 @@ public class Legend extends Composite implements ILegend, PaintListener {
 		gc.setLineWidth(1);
 		gc.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_GRAY));
 		gc.drawRectangle(0, 0, getSize().x - 1, getSize().y - 1);
+
+      // Draw column headers
+      if (extended)
+      {
+         gc.setBackground(getBackground());
+         gc.setForeground(getForeground());
+         gc.setFont(headerFont);
+         
+         final int shift = Util.getExtentInGC(getFont(), VALUE_PLACEHOLDER).x + EXT_COL_MARGIN;
+         
+         Rectangle r = cellBounds.get(HEADER_ID);
+         int x = r.x + extendedInfoOffset + MARGIN * 2;
+
+         gc.drawText("Curr", x, r.y, true);
+         x += shift;
+
+         gc.drawText("Min", x, r.y, true);
+         x += shift;
+
+         gc.drawText("Avg", x, r.y, true);
+         x += shift;
+
+         gc.drawText("Max", x, r.y, true);
+         
+         gc.setFont(getFont());
+      }
+
 		// draw content
-		for(int i = 0; i < seriesArray.length; i++) {
-			if(!seriesArray[i].isVisibleInLegend()) {
+		for(int i = 0; i < seriesArray.length; i++)
+		{
+			if (!seriesArray[i].isVisibleInLegend())
 				continue;
-			}
-			//
-			if(seriesArray[i] instanceof ICircularSeries) {
+
+			if (seriesArray[i] instanceof ICircularSeries)
+			{
 				ICircularSeries<?> pieSeries = (ICircularSeries<?>)seriesArray[i];
 				String[] labels = pieSeries.getLabels();
 				Color[] color = pieSeries.getColors();
@@ -450,7 +587,9 @@ public class Legend extends Composite implements ILegend, PaintListener {
 						}
 					}
 				}
-			} else {
+			}
+			else
+			{
 				// draw plot line, symbol etc
 				String id = seriesArray[i].getId();
 				Rectangle r = cellBounds.get(id);
@@ -460,6 +599,11 @@ public class Legend extends Composite implements ILegend, PaintListener {
 				gc.setBackground(getBackground());
 				gc.setForeground(getForeground());
 				gc.drawText(label, r.x + SYMBOL_WIDTH + MARGIN * 2, r.y, true);
+
+	         if (extended)
+	         {
+	            drawExtendedInfo(gc, (Series<?>)seriesArray[i], r);
+	         }
 			}
 		}
 	}
