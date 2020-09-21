@@ -207,16 +207,26 @@ public class AxisTickLabels implements PaintListener {
 
 		double min = axis.getRange().lower;
 		double max = axis.getRange().upper;
+
 		int digitMin = (int)Math.ceil(Math.log10(min));
 		int digitMax = (int)Math.ceil(Math.log10(max));
+
 		final BigDecimal MIN = BigDecimal.valueOf(min);
 		BigDecimal tickStep = pow(10, digitMin - 1);
 		BigDecimal firstPosition;
-		if(MIN.remainder(tickStep).doubleValue() <= 0) {
+
+      if (!axis.isHorizontalAxis())
+         chart.setCachedTickStep(tickStep.doubleValue());
+
+		if (MIN.remainder(tickStep).doubleValue() <= 0)
+		{
 			firstPosition = MIN.subtract(MIN.remainder(tickStep));
-		} else {
+		}
+		else
+		{
 			firstPosition = MIN.subtract(MIN.remainder(tickStep)).add(tickStep);
 		}
+
 		for(int i = digitMin; i <= digitMax; i++) {
 			for(BigDecimal j = firstPosition; j.doubleValue() <= pow(10, i).doubleValue(); j = j.add(tickStep)) {
 				if(j.doubleValue() > max) {
@@ -260,8 +270,13 @@ public class AxisTickLabels implements PaintListener {
 
 		double min = axis.getRange().lower;
 		double max = axis.getRange().upper;
+		
+      if (!axis.isHorizontalAxis())
+         chart.setCachedTickStep(tickStep.doubleValue());
+		
 		final BigDecimal MIN = BigDecimal.valueOf(min);
 		BigDecimal firstPosition;
+
 		/* if (min % tickStep <= 0) */
 		if(MIN.remainder(tickStep).doubleValue() <= 0) {
 			/* firstPosition = min - min % tickStep */
@@ -270,6 +285,7 @@ public class AxisTickLabels implements PaintListener {
 			/* firstPosition = min - min % tickStep + tickStep */
 			firstPosition = MIN.subtract(MIN.remainder(tickStep)).add(tickStep);
 		}
+
 		for(BigDecimal b = firstPosition; b.doubleValue() <= max; b = b.add(tickStep)) {
 			tickLabels.add(format(b.doubleValue()));
 			tickLabelValues.add(b.doubleValue());

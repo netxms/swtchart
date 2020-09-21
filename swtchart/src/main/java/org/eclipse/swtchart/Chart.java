@@ -68,6 +68,8 @@ public class Chart extends Composite implements Listener {
    protected boolean useMultipliers = true;
 	/** the set of plots */
 	protected SeriesSet seriesSet;
+   /** cached tick step on Y axis */
+   protected double cachedTickStep = 0;
 	private final List<PaintListener> paintListener = new ArrayList<>();
 
 	/**
@@ -557,5 +559,15 @@ public class Chart extends Composite implements Listener {
       DecimalFormat df = new DecimalFormat();
       df.setMaximumFractionDigits(maxPrecision);
       return df.format(value);
+   }
+
+   /**
+    * Set cached tick step on Y axis.
+    * 
+    * @param cachedTickStep cached tick step on Y axis
+    */
+   public void setCachedTickStep(double cachedTickStep)
+   {
+      this.cachedTickStep = cachedTickStep;
    }
 }
