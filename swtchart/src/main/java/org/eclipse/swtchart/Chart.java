@@ -13,6 +13,7 @@
  *******************************************************************************/
 package org.eclipse.swtchart;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,19 +51,21 @@ public class Chart extends Composite implements Listener {
 	/** translucent areas flag */
 	protected boolean translucent = true;
 	/** the title */
-	private final Title title;
+	protected final Title title;
 	/** the legend */
-	private final Legend legend;
+	protected final Legend legend;
 	/** the set of axes */
-	private final AxisSet axisSet;
+	protected final AxisSet axisSet;
 	/** the plot area */
-	private IPlotArea plotArea;
+	protected IPlotArea plotArea;
 	/** the orientation of chart which can be horizontal or vertical */
-	private int orientation;
+	protected int orientation;
 	/** the state indicating if compressing series is enabled */
-	private boolean compressEnabled;
+	protected boolean compressEnabled;
 	/** the state indicating if the update of chart appearance is suspended */
-	private boolean updateSuspended;
+	protected boolean updateSuspended;
+   /** show/hide multipliers */
+   protected boolean useMultipliers = true;
 	/** the set of plots */
 	protected SeriesSet seriesSet;
 	private final List<PaintListener> paintListener = new ArrayList<>();
@@ -501,6 +504,9 @@ public class Chart extends Composite implements Listener {
 		}
 	}
 
+	/**
+	 * @see org.eclipse.swt.widgets.Control#addPaintListener(org.eclipse.swt.events.PaintListener)
+	 */
 	@Override
 	public void addPaintListener(PaintListener listener) {
 
@@ -508,10 +514,48 @@ public class Chart extends Composite implements Listener {
 		super.addPaintListener(listener);
 	}
 
+	/**
+	 * @see org.eclipse.swt.widgets.Control#removePaintListener(org.eclipse.swt.events.PaintListener)
+	 */
 	@Override
 	public void removePaintListener(PaintListener listener) {
 
 		paintListener.remove(listener);
 		super.removePaintListener(listener);
 	}
+
+   /**
+    * @return are multipliers used
+    */
+   public boolean isUseMultipliers()
+   {
+      return useMultipliers;
+   }
+
+   /**
+    * @param useMultipliers set to use multipliers
+    */
+   public void setUseMultipliers(boolean useMultipliers)
+   {
+      this.useMultipliers = useMultipliers;
+      
+      IAxisSet axisSet = getAxisSet();
+      IAxis yAxis = axisSet.getYAxis(0);
+      yAxis.setUseMultipliers(useMultipliers);
+   }
+   
+   /**
+    * Build rounded decimal value for legend. Default implementation will just return double with given precision.
+    *
+    * @param value value to format
+    * @param step step of label
+    * @param maxPrecision desired precision
+    * @return rounded value
+    */
+   public String roundDecimalValue(double value, double step, int maxPrecision)
+   {
+      DecimalFormat df = new DecimalFormat();
+      df.setMaximumFractionDigits(maxPrecision);
+      return df.format(value);
+   }
 }

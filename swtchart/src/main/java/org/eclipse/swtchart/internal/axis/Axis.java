@@ -33,8 +33,8 @@ import org.eclipse.swtchart.internal.series.SeriesSet;
 /**
  * An axis.
  */
-public class Axis implements IAxis {
-
+public class Axis implements IAxis
+{
 	/** the margin in pixels */
 	public final static int MARGIN = 5;
 	/** the default minimum value of range */
@@ -87,6 +87,8 @@ public class Axis implements IAxis {
 	private int width;
 	/** the plot area height */
 	private int height;
+   /** enable or disable multipliers */
+   private boolean useMultipliers = true;
 	/** the list of dispose listeners */
 	private List<IDisposeListener> listeners;
 
@@ -763,4 +765,20 @@ public class Axis implements IAxis {
 			}
 		}
 	}
+
+   /**
+    * @return the useMultipliers
+    */
+   public boolean isUseMultipliers()
+   {
+      return useMultipliers;
+   }
+
+   /**
+    * @param useMultipliers the useMultipliers to set
+    */
+   public void setUseMultipliers(boolean useMultipliers)
+   {
+      this.useMultipliers = useMultipliers;
+   }
 }

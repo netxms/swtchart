@@ -246,4 +246,14 @@ public interface IAxis {
 	void setIntegerDataPointAxis(boolean integerDataPointAxis);
 	
 	boolean isIntegerDataPointAxis();
+
+   /**
+    * @return the useMultipliers
+    */
+   public boolean isUseMultipliers();
+   
+   /**
+    * @param useMultipliers the useMultipliers to set
+    */
+   public void setUseMultipliers(boolean useMultipliers);
 }

@@ -503,16 +503,16 @@ public class Legend extends Composite implements ILegend, PaintListener
       int shift = Util.getExtentInGC(getFont(), VALUE_PLACEHOLDER).x + EXT_COL_MARGIN;
       int x = r.x + extendedInfoOffset + MARGIN * 2;
       
-      gc.drawText(chart.isUseMultipliers() ? DataFormatter.roundDecimalValue(series.getCurY(), 0.005, 3) : Double.toString(series.getCurY()), x, r.y, true);
+      gc.drawText(chart.isUseMultipliers() ? chart.roundDecimalValue(series.getCurY(), 0.005, 3) : Double.toString(series.getCurY()), x, r.y, true);
       x += shift;
 
-      gc.drawText(chart.isUseMultipliers() ? DataFormatter.roundDecimalValue(series.getMinY(), 0.005, 3) : Double.toString(series.getMinY()), x, r.y, true);
+      gc.drawText(chart.isUseMultipliers() ? chart.roundDecimalValue(series.getMinY(), 0.005, 3) : Double.toString(series.getMinY()), x, r.y, true);
       x += shift;
 
-      gc.drawText(chart.isUseMultipliers() ? DataFormatter.roundDecimalValue(series.getAvgY(), 0.005, 3) : Double.toString(series.getAvgY()), x, r.y, true);
+      gc.drawText(chart.isUseMultipliers() ? chart.roundDecimalValue(series.getAvgY(), 0.005, 3) : Double.toString(series.getAvgY()), x, r.y, true);
       x += shift;
 
-      gc.drawText(chart.isUseMultipliers() ? DataFormatter.roundDecimalValue(series.getMaxY(), 0.005, 3) : Double.toString(series.getMaxY()), x, r.y, true);
+      gc.drawText(chart.isUseMultipliers() ? chart.roundDecimalValue(series.getMaxY(), 0.005, 3) : Double.toString(series.getMaxY()), x, r.y, true);
    }
 
 	/**
