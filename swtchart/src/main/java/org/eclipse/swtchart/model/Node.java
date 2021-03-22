@@ -219,8 +219,6 @@ public class Node {
 	 * 
 	 * @param labels
 	 * @param vals
-	 * @return the String-node map with each node having containing data
-	 *         corresponding to the variables passed
 	 */
 	public void addChildren(String[] labels, double[] vals) {
 
@@ -240,7 +238,6 @@ public class Node {
 	 * The nodes added are not the same as nodes provided in input.
 	 * 
 	 * @param nodes
-	 * @return
 	 */
 	public void addChildren(Node[] nodes) {
 

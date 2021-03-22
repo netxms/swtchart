@@ -22,7 +22,7 @@ public interface IGrid {
 	/**
 	 * returns the visibility of Grid
 	 * 
-	 * @returns if Grid is Visible
+	 * @return if Grid is Visible
 	 */
 	public boolean isVisible();
 

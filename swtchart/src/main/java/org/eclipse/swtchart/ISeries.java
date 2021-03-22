@@ -261,14 +261,14 @@ public interface ISeries<DataType> {
 	 * By default, legend displays the description, when it is set.
 	 * 
 	 * @param description
-	 *            the series description, or <tt>null</tt> to clear it
+	 *            the series description, or <code>null</code> to clear it
 	 */
 	void setDescription(String description);
 
 	/**
 	 * Gets the series description
 	 * 
-	 * @return the series description, or <tt>null<tt> if not set
+	 * @return the series description, or <code>null</code> if not set
 	 */
 	String getDescription();
 

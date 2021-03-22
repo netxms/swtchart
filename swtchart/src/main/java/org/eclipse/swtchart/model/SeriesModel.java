@@ -15,7 +15,7 @@ package org.eclipse.swtchart.model;
  * 
  * @author Christoph Läubrich
  *
- * @param <SeriesTypes>
+ * @param <T>
  */
 public interface SeriesModel<T> extends Iterable<T> {
 }

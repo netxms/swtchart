@@ -23,7 +23,7 @@ public interface ISeriesLabel {
 	/**
 	 * Sets the decimal format {@link java.text.DecimalFormat} or/plus plain string.
 	 * <p>
-	 * If formats have been set with <tt>setFormats(String[])</tt>, the format
+	 * If formats have been set with <code>setFormats(String[])</code>, the format
 	 * set with this method will be ignored.
 	 * <p>
 	 * If null is given, default format "#.###########" will be set.
@@ -42,7 +42,7 @@ public interface ISeriesLabel {
 
 	/**
 	 * Sets the formats for all data points. If null or empty array is given, formats will
-	 * be cleared, and the format set with <tt>setFormat(String)</tt> will be used
+	 * be cleared, and the format set with <code>setFormat(String)</code> will be used
 	 * instead.
 	 *
 	 * @param formats

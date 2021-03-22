@@ -68,7 +68,7 @@ public interface IErrorBar {
 	Color getColor();
 
 	/**
-	 * Sets the error bar color. If <tt>null</tt> is given, default color will
+	 * Sets the error bar color. If <code>null</code> is given, default color will
 	 * be set.
 	 *
 	 * @param color

@@ -73,7 +73,7 @@ public interface ITitle {
 	 * are used.
 	 * 
 	 * @param styleRanges
-	 *            the style ranges, or <tt>null</tt> to clear the currently set
+	 *            the style ranges, or <code>null</code> to clear the currently set
 	 *            style ranges.
 	 */
 	public void setStyleRanges(StyleRange[] styleRanges);

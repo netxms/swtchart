@@ -74,7 +74,7 @@ public class CircularLegend extends Composite implements ILegend, PaintListener 
 	/**
 	 * Constructor.
 	 *
-	 * @param chart
+	 * @param composite
 	 *            the chart
 	 * @param style
 	 *            the style

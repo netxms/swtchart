@@ -82,7 +82,7 @@ public interface IAxisTick {
 	 * Sets the tick mark step hint in pixels.
 	 *
 	 * @param tickMarkStepHint
-	 *            the tick mark step hint with pixels (>
+	 *            the tick mark step hint with pixels (&gt;
 	 *            IAxisTick.MIN_GRID_STEP_HINT)
 	 */
 	void setTickMarkStepHint(int tickMarkStepHint);
@@ -105,9 +105,9 @@ public interface IAxisTick {
 	void setTickLabelAngle(int angle);
 
 	/**
-	 * Sets the format for axis tick label. <tt>DecimalFormat</tt> and
-	 * <tt>DateFormat</tt> should be used for <tt>double[]</tt> series and
-	 * <tt>Date[]</tt> series respectively.
+	 * Sets the format for axis tick label. <code>DecimalFormat</code> and
+	 * <code>DateFormat</code> should be used for <code>double[]</code> series and
+	 * <code>Date[]</code> series respectively.
 	 *
 	 * @param format
 	 *            the format
@@ -125,7 +125,7 @@ public interface IAxisTick {
 	 * Gets the bounds of axis tick.
 	 * <p>
 	 * This method is typically used for mouse listener to check whether mouse
-	 * cursor is on axis tick. Mouse listener can be added to <tt>Chart</tt>.
+	 * cursor is on axis tick. Mouse listener can be added to <code>Chart</code>.
 	 *
 	 * @return the bounds of axis tick.
 	 */

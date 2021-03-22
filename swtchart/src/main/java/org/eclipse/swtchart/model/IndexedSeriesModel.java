@@ -31,7 +31,7 @@ public interface IndexedSeriesModel<T> extends SeriesModel<T> {
 	 * @param index
 	 * @return
 	 * @throws IndexOutOfBoundsException
-	 *             if index < 0 or >= {@link #size()}
+	 *             if index &lt; 0 or &ge; {@link #size()}
 	 */
 	T itemAt(int index) throws IndexOutOfBoundsException;
 }
