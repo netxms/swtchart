@@ -16,6 +16,9 @@ target
 /eclipse
 .metadata
 .recommenders
+/rwtchart/.classpath
+/rwtchart/.project
+/rwtchart/.settings/
 /swtchart/.classpath
 /swtchart/.project
 /swtchart/.settings/
