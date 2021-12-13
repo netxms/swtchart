@@ -26,6 +26,7 @@ import org.eclipse.swtchart.IAxis.Direction;
 import org.eclipse.swtchart.ILineSeries;
 import org.eclipse.swtchart.LineStyle;
 import org.eclipse.swtchart.Range;
+import org.eclipse.swtchart.internal.Util;
 import org.eclipse.swtchart.internal.axis.Axis;
 import org.eclipse.swtchart.internal.compress.CompressLineSeries;
 import org.eclipse.swtchart.internal.compress.CompressScatterSeries;
@@ -392,7 +393,7 @@ public class LineSeries<T> extends Series<T> implements ILineSeries<T> {
 				xseries[i] = indexes[i];
 			}
 		}
-		// FIXME: gc.setLineStyle(Util.getIndexDefinedInSWT(lineStyle));
+		gc.setLineStyle(Util.getIndexDefinedInSWT(lineStyle));
 		Color oldForeground = gc.getForeground();
 		gc.setForeground(getLineColor());
 		boolean isHorizontal = xAxis.isHorizontalAxis();
@@ -695,12 +696,12 @@ public class LineSeries<T> extends Series<T> implements ILineSeries<T> {
 				gc.fillPolygon(invertedTriangleArray);
 				break;
 			case CROSS:
-				// FIXME: gc.setLineStyle(SWT.LINE_SOLID);
+				gc.setLineStyle(SWT.LINE_SOLID);
 				gc.drawLine(h - symbolSize, v - symbolSize, h + symbolSize, v + symbolSize);
 				gc.drawLine(h - symbolSize, v + symbolSize, h + symbolSize, v - symbolSize);
 				break;
 			case PLUS:
-			   // FIXME: gc.setLineStyle(SWT.LINE_SOLID);
+			        gc.setLineStyle(SWT.LINE_SOLID);
 				gc.drawLine(h, v - symbolSize, h, v + symbolSize);
 				gc.drawLine(h - symbolSize, v, h + symbolSize, v);
 				break;

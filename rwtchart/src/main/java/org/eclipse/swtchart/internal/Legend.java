@@ -471,7 +471,7 @@ public class Legend extends Canvas implements ILegend, PaintListener
 			int y = r.y + r.height / 2;
 			if(lineStyle != SWT.NONE)
 			{
-				// FIXME: gc.setLineStyle(lineStyle);
+				gc.setLineStyle(lineStyle);
 				gc.drawLine(x, y, x + SYMBOL_WIDTH, y);
 			}
 			// draw series symbol
@@ -532,7 +532,7 @@ public class Legend extends Canvas implements ILegend, PaintListener
 		}
 		// draw frame
 		gc.fillRectangle(0, 0, getSize().x - 1, getSize().y - 1);
-		// FIXME: gc.setLineStyle(SWT.LINE_SOLID);
+		gc.setLineStyle(SWT.LINE_SOLID);
 		gc.setLineWidth(1);
 		gc.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_GRAY));
 		gc.drawRectangle(0, 0, getSize().x - 1, getSize().y - 1);

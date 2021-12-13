@@ -201,7 +201,7 @@ public class ErrorBar implements IErrorBar {
 		}
 		int oldLineWidth = gc.getLineWidth();
 		gc.setLineWidth(lineWidth);
-		// FIXME: gc.setLineStyle(SWT.LINE_SOLID);
+		gc.setLineStyle(SWT.LINE_SOLID);
 		Color oldForeground = gc.getForeground();
 		gc.setForeground(getColor());
 		// get plus/minus error

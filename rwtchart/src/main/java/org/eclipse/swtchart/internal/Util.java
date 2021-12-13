@@ -70,9 +70,6 @@ public final class Util {
 	 */
 	public static int getIndexDefinedInSWT(LineStyle lineStyle)
 	{
-	   /* FIXME */
-	   return SWT.NONE;
-	   /*
 		switch(lineStyle) {
 			case NONE:
 				return SWT.NONE;
@@ -89,6 +86,5 @@ public final class Util {
 			default:
 				return SWT.LINE_SOLID;
 		}
-		*/
 	}
 }

@@ -387,7 +387,7 @@ public class CircularLegend extends Canvas implements ILegend, PaintListener {
 		}
 		// draw frame
 		gc.fillRectangle(0, 0, getSize().x - 1, getSize().y - 1);
-		// FIXME: gc.setLineStyle(SWT.LINE_SOLID);
+		gc.setLineStyle(SWT.LINE_SOLID);
 		gc.setLineWidth(1);
 		gc.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_GRAY));
 		gc.drawRectangle(0, 0, getSize().x - 1, getSize().y - 1);

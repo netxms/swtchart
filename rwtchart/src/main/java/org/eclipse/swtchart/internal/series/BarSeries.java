@@ -458,7 +458,7 @@ public class BarSeries<T> extends Series<T> implements IBarSeries<T> {
 		Color oldBackground = gc.getBackground();
 		gc.setBackground(getBarColor());
 		gc.fillRectangle(h, v, width, height);
-		// FIXME: gc.setLineStyle(SWT.LINE_SOLID);
+		gc.setLineStyle(SWT.LINE_SOLID);
 		Color frameColor = getFrameColor(getBarColor());
 		Color oldForeground = gc.getForeground();
 		gc.setForeground(frameColor);

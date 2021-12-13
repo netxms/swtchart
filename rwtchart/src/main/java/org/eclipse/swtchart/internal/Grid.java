@@ -128,7 +128,7 @@ public class Grid implements IGrid {
 		Color oldForeground = gc.getForeground();
 		gc.setForeground(getForeground());
 		ArrayList<Integer> tickLabelPosition = axis.getTick().getAxisTickLabels().getTickLabelPositions();
-		// FIXME: gc.setLineStyle(Util.getIndexDefinedInSWT(lineStyle));
+		gc.setLineStyle(Util.getIndexDefinedInSWT(lineStyle));
 		if(axis.isValidCategoryAxis()) {
 			int step = 0;
 			if(tickLabelPosition.size() > 1) {

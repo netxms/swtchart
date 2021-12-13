@@ -4,7 +4,7 @@
 
    <groupId>org.netxms</groupId>
    <artifactId>rwtchart</artifactId>
-   <version>1.1</version>
+   <version>1.2</version>
    <packaging>jar</packaging>
 
    <name>rwtchart</name>
@@ -27,7 +27,7 @@
       <dependency>
          <groupId>org.eclipse.rap</groupId>
          <artifactId>org.eclipse.rap.rwt</artifactId>
-         <version>3.18.0</version>
+         <version>3.19.0</version>
          <scope>${lib.scope}</scope>
       </dependency>
    </dependencies>

@@ -55,7 +55,7 @@ public abstract class CircularSeries extends Series implements ICircularSeries {
 		borderColor = Display.getDefault().getSystemColor(SWT.COLOR_BLACK);
 		borderWidth = 1;
 		highlightLineWidth = 3;
-		borderStyle = 0; // FIXME: SWT.LINE_SOLID;
+		borderStyle = SWT.LINE_SOLID;
 	}
 
 	@Override
@@ -258,7 +258,7 @@ public abstract class CircularSeries extends Series implements ICircularSeries {
 		 */
 		gc.setForeground(borderColor);
 		//
-		// FIXME: gc.setLineStyle(borderStyle);
+		gc.setLineStyle(borderStyle);
 		//
 		gc.setLineWidth(borderWidth);
 		/*
