@@ -43,10 +43,7 @@ public final class Util {
 			return new Point(0, 0);
 		}
 		// create GC
-		int ARBITRARY_WIDTH = 10;
-		int ARBITRARY_HEIGHT = 10;
-		Image image = new Image(Display.getCurrent(), ARBITRARY_WIDTH, ARBITRARY_HEIGHT);
-		GC gc = new GC(image);
+		GC gc = new GC(Display.getCurrent());
 		// get extent of text with given font
 		gc.setFont(font);
 		Point p;
@@ -56,7 +53,6 @@ public final class Util {
 			p = gc.textExtent(text);
 		}
 		// dispose resources
-		image.dispose();
 		gc.dispose();
 		return p;
 	}
