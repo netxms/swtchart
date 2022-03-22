@@ -16,7 +16,6 @@ package org.eclipse.swtchart.internal.series;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
@@ -585,7 +584,7 @@ public class LineSeries<T> extends Series<T> implements ILineSeries<T> {
 	private void drawArea(GC gc, int[] p, boolean isHorizontal) {
 
 		int alpha = gc.getAlpha();
-		gc.setAlpha(ALPHA);
+      gc.setAlpha(chart.isTranslucent() ? ALPHA : 255);
 		Color oldBackground = gc.getBackground();
 		gc.setBackground(getLineColor());
 		int[] pointArray;

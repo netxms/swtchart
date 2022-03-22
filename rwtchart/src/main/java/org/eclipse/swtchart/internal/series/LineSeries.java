@@ -584,7 +584,7 @@ public class LineSeries<T> extends Series<T> implements ILineSeries<T> {
 	private void drawArea(GC gc, int[] p, boolean isHorizontal) {
 
 		int alpha = gc.getAlpha();
-		gc.setAlpha(ALPHA);
+      gc.setAlpha(chart.isTranslucent() ? ALPHA : 255);
 		Color oldBackground = gc.getBackground();
 		gc.setBackground(getLineColor());
 		int[] pointArray;
@@ -701,7 +701,7 @@ public class LineSeries<T> extends Series<T> implements ILineSeries<T> {
 				gc.drawLine(h - symbolSize, v + symbolSize, h + symbolSize, v - symbolSize);
 				break;
 			case PLUS:
-			        gc.setLineStyle(SWT.LINE_SOLID);
+				gc.setLineStyle(SWT.LINE_SOLID);
 				gc.drawLine(h, v - symbolSize, h, v + symbolSize);
 				gc.drawLine(h - symbolSize, v, h + symbolSize, v);
 				break;
