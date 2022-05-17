@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
@@ -43,7 +42,12 @@ import org.eclipse.swtchart.internal.Util;
 /**
  * Axis tick labels.
  */
-public class AxisTickLabels implements PaintListener {
+public class AxisTickLabels implements PaintListener
+{
+   private static final long[] DECIMAL_MULTIPLIERS = { 1L, 1000L, 1000000L, 1000000000L, 1000000000000L, 1000000000000000L };
+   private static final long[] BINARY_MULTIPLIERS = { 1L, 0x400L, 0x100000L, 0x40000000L, 0x10000000000L, 0x4000000000000L };
+   private static final String[] DECIMAL_SUFFIXES = { "", " k", " M", " G", " T", " P" };
+   private static final String[] BINARY_SUFFIXES = { "", " Ki", " Mi", " Gi", " Ti", " Pi" };
 
 	/** the chart */
 	private final Chart chart;
@@ -81,13 +85,11 @@ public class AxisTickLabels implements PaintListener {
 	/**
 	 * Constructor.
 	 * 
-	 * @param chart
-	 *            the chart
-	 * @param axis
-	 *            the axis
+	 * @param chart the chart
+	 * @param axis the axis
 	 */
-	protected AxisTickLabels(Chart chart, Axis axis) {
-
+	protected AxisTickLabels(Chart chart, Axis axis)
+	{
 		this.chart = chart;
 		this.axis = axis;
 		tickLabelValues = new ArrayList<Double>();
@@ -103,15 +105,16 @@ public class AxisTickLabels implements PaintListener {
 	/**
 	 * Initialized the possible tick steps.
 	 */
-	private void initializePossibleTickSteps() {
+	private void initializePossibleTickSteps()
+	{
+		final Integer[] milliseconds = { 1, 2, 5, 10, 20, 50, 100, 200, 500, 999 };
+		final Integer[] seconds = { 1, 2, 5, 10, 15, 20, 30, 59 };
+		final Integer[] minutes = { 1, 2, 3, 5, 10, 15, 20, 30, 59 };
+		final Integer[] hours = { 1, 2, 3, 4, 6, 12, 22 };
+		final Integer[] dates = { 1, 7, 14, 28 };
+		final Integer[] months = { 1, 2, 3, 4, 6, 11 };
+		final Integer[] years = { 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000 };
 
-		final Integer[] milliseconds = {1, 2, 5, 10, 20, 50, 100, 200, 500, 999};
-		final Integer[] seconds = {1, 2, 5, 10, 15, 20, 30, 59};
-		final Integer[] minutes = {1, 2, 3, 5, 10, 15, 20, 30, 59};
-		final Integer[] hours = {1, 2, 3, 4, 6, 12, 22};
-		final Integer[] dates = {1, 7, 14, 28};
-		final Integer[] months = {1, 2, 3, 4, 6, 11};
-		final Integer[] years = {1, 2, 5, 10, 20, 50, 100, 200, 500, 1000};
 		possibleTickSteps = new HashMap<Integer, Integer[]>();
 		possibleTickSteps.put(Calendar.MILLISECOND, milliseconds);
 		possibleTickSteps.put(Calendar.SECOND, seconds);
@@ -125,14 +128,16 @@ public class AxisTickLabels implements PaintListener {
 	/**
 	 * Sets the foreground color.
 	 * 
-	 * @param color
-	 *            the foreground color
+	 * @param color the foreground color
 	 */
-	public void setForeground(Color color) {
-
-		if(color == null) {
+	public void setForeground(Color color)
+	{
+		if (color == null)
+		{
 			foreground = Display.getDefault().getSystemColor(DEFAULT_FOREGROUND);
-		} else {
+		}
+		else
+		{
 			foreground = color;
 		}
 	}
@@ -142,9 +147,10 @@ public class AxisTickLabels implements PaintListener {
 	 * 
 	 * @return the foreground color
 	 */
-	protected Color getForeground() {
-
-		if(foreground.isDisposed()) {
+	protected Color getForeground()
+	{
+		if (foreground.isDisposed())
+		{
 			foreground = Display.getDefault().getSystemColor(DEFAULT_FOREGROUND);
 		}
 		return foreground;
@@ -153,17 +159,20 @@ public class AxisTickLabels implements PaintListener {
 	/**
 	 * Updates the tick labels.
 	 * 
-	 * @param length
-	 *            the axis length
+	 * @param length the axis length
 	 */
-	protected void update(int length) {
-
+	protected void update(int length)
+	{
 		tickLabelValues.clear();
 		tickLabels.clear();
 		tickLabelPositions.clear();
-		if(axis.isValidCategoryAxis()) {
+
+		if (axis.isValidCategoryAxis())
+		{
 			updateTickLabelForCategoryAxis(length);
-		} else if(axis.isLogScaleEnabled()) {
+		}
+		else if (axis.isLogScaleEnabled())
+		{
 			updateTickLabelForLogScale(length);
 		} else {
 			updateTickLabelForLinearScale(length);
@@ -174,21 +183,26 @@ public class AxisTickLabels implements PaintListener {
 	/**
 	 * Updates tick label for category axis.
 	 * 
-	 * @param length
-	 *            the length of axis
+	 * @param length the length of axis
 	 */
 	private void updateTickLabelForCategoryAxis(int length) {
 
 		String[] series = axis.getCategorySeries();
-		if(series == null) {
+		if (series == null)
+		{
 			return;
 		}
+
 		int min = (int)axis.getRange().lower;
 		int max = (int)axis.getRange().upper;
+
 		int sizeOfTickLabels = (series.length < max - min + 1) ? series.length : max - min + 1;
 		int initialIndex = (min < 0) ? 0 : min;
-		for(int i = 0; i < sizeOfTickLabels; i++) {
+
+		for(int i = 0; i < sizeOfTickLabels; i++)
+		{
 			tickLabels.add(series[i + initialIndex]);
+
 			int tickLabelPosition = (int)(length * (i + 0.5) / sizeOfTickLabels);
 			if(axis.isReversed()) {
 				tickLabelPosition = correctPositionInReversedAxis(tickLabelPosition);
@@ -200,13 +214,21 @@ public class AxisTickLabels implements PaintListener {
 	/**
 	 * Updates tick label for log scale.
 	 * 
-	 * @param length
-	 *            the length of axis
+	 * @param length the length of axis
 	 */
-	private void updateTickLabelForLogScale(int length) {
-
+	private void updateTickLabelForLogScale(int length)
+	{
 		double min = axis.getRange().lower;
 		double max = axis.getRange().upper;
+
+      if (min == 0)
+      {
+         min = Math.min(max / 10.0, 0.1);
+         BigDecimal tickStep = pow(10, (int)Math.ceil(Math.log10(min)) - 1);
+         tickLabels.add(format(0.0, tickStep.doubleValue()));
+         tickLabelValues.add(0.0);
+         tickLabelPositions.add(0);
+      }
 
 		int digitMin = (int)Math.ceil(Math.log10(min));
 		int digitMax = (int)Math.ceil(Math.log10(max));
@@ -227,32 +249,35 @@ public class AxisTickLabels implements PaintListener {
 			firstPosition = MIN.subtract(MIN.remainder(tickStep)).add(tickStep);
 		}
 
-		for(int i = digitMin; i <= digitMax; i++) {
-			for(BigDecimal j = firstPosition; j.doubleValue() <= pow(10, i).doubleValue(); j = j.add(tickStep)) {
-				if(j.doubleValue() > max) {
-					break;
-				}
-				tickLabels.add(format(j.doubleValue()));
-				tickLabelValues.add(j.doubleValue());
-				int tickLabelPosition = (int)((Math.log10(j.doubleValue()) - Math.log10(min)) / (Math.log10(max) - Math.log10(min)) * length);
-				if(axis.isReversed()) {
-					tickLabelPosition = correctPositionInReversedAxis(tickLabelPosition);
-				}
-				tickLabelPositions.add(tickLabelPosition);
-			}
-			tickStep = tickStep.multiply(pow(10, 1));
-			firstPosition = tickStep.add(pow(10, i));
-		}
+      for(int i = digitMin; i <= digitMax; i++)
+      {
+         for(BigDecimal j = firstPosition; j.doubleValue() <= pow(10, i).doubleValue(); j = j.add(tickStep))
+         {
+            if (j.doubleValue() > max)
+            {
+               break;
+            }
+            tickLabels.add(format(j.doubleValue(), tickStep.doubleValue()));
+            tickLabelValues.add(j.doubleValue());
+            int tickLabelPosition = (int)((Math.log10(j.doubleValue()) - Math.log10(min)) / (Math.log10(max) - Math.log10(min)) * length);
+            if (axis.isReversed())
+            {
+               tickLabelPosition = correctPositionInReversedAxis(tickLabelPosition);
+            }
+            tickLabelPositions.add(tickLabelPosition);
+         }
+         tickStep = tickStep.multiply(pow(10, 1));
+         firstPosition = tickStep.add(pow(10, i));
+      }
 	}
 
 	/**
 	 * Updates tick label for normal scale.
 	 * 
-	 * @param length
-	 *            axis length (>0)
+	 * @param length axis length (>0)
 	 */
-	private void updateTickLabelForLinearScale(int length) {
-
+	private void updateTickLabelForLinearScale(int length)
+	{
 		double min = axis.getRange().lower;
 		double max = axis.getRange().upper;
 		updateTickLabelForLinearScale(length, getGridStep(length, min, max));
@@ -261,10 +286,8 @@ public class AxisTickLabels implements PaintListener {
 	/**
 	 * Updates tick label for normal scale.
 	 * 
-	 * @param length
-	 *            axis length (>0)
-	 * @param tickStep
-	 *            the tick step
+	 * @param length axis length (>0)
+	 * @param tickStep the tick step
 	 */
 	private void updateTickLabelForLinearScale(int length, BigDecimal tickStep) {
 
@@ -278,23 +301,28 @@ public class AxisTickLabels implements PaintListener {
 		BigDecimal firstPosition;
 
 		/* if (min % tickStep <= 0) */
-		if(MIN.remainder(tickStep).doubleValue() <= 0) {
+		if (MIN.remainder(tickStep).doubleValue() <= 0)
+		{
 			/* firstPosition = min - min % tickStep */
 			firstPosition = MIN.subtract(MIN.remainder(tickStep));
-		} else {
+		}
+		else
+		{
 			/* firstPosition = min - min % tickStep + tickStep */
 			firstPosition = MIN.subtract(MIN.remainder(tickStep)).add(tickStep);
 		}
 
-		for(BigDecimal b = firstPosition; b.doubleValue() <= max; b = b.add(tickStep)) {
-			tickLabels.add(format(b.doubleValue()));
-			tickLabelValues.add(b.doubleValue());
-			int tickLabelPosition = (int)((b.doubleValue() - min) / (max - min) * length);
-			if(axis.isReversed()) {
-				tickLabelPosition = correctPositionInReversedAxis(tickLabelPosition);
-			}
-			tickLabelPositions.add(tickLabelPosition);
-		}
+      for(BigDecimal b = firstPosition; b.doubleValue() <= max; b = b.add(tickStep))
+      {
+         tickLabels.add(format(b.doubleValue(), tickStep.doubleValue()));
+         tickLabelValues.add(b.doubleValue());
+         int tickLabelPosition = (int)((b.doubleValue() - min) / (max - min) * length);
+         if (axis.isReversed())
+         {
+            tickLabelPosition = correctPositionInReversedAxis(tickLabelPosition);
+         }
+         tickLabelPositions.add(tickLabelPosition);
+      }
 	}
 
 	private int correctPositionInReversedAxis(int position) {
@@ -309,76 +337,116 @@ public class AxisTickLabels implements PaintListener {
 	/**
 	 * Updates the visibility of tick labels.
 	 */
-	private void updateTickVisibility() {
+   private void updateTickVisibility()
+   {
 
-		// initialize the array of tick label visibility state
-		tickVisibilities.clear();
-		for(int i = 0; i < tickLabelPositions.size(); i++) {
-			tickVisibilities.add(Boolean.TRUE);
-		}
-		if(tickLabelPositions.size() == 0 || axis.getTick().getTickLabelAngle() != 0) {
-			return;
-		}
-		// set the tick label visibility
-		int previousPosition = 0;
-		for(int i = 0; i < tickLabelPositions.size(); i++) {
-			// check if there is enough space to draw tick label
-			boolean hasSpaceToDraw = true;
-			if(i != 0) {
-				hasSpaceToDraw = hasSpaceToDraw(previousPosition, tickLabelPositions.get(i), tickLabels.get(i));
-			}
-			// check if the tick label value is major
-			boolean isMajorTick = true;
-			if(!axis.isValidCategoryAxis()) {
-				if(axis.isLogScaleEnabled()) {
-					isMajorTick = isMajorTick(tickLabelValues.get(i));
-				}
-				// check if the same tick label is repeated
-				String currentLabel = tickLabels.get(i);
-				try {
-					/*
-					 * Check if the value is close to the tick label, then it is a major tick
-					 * Patch by MatthewKhouzam
-					 * https://github.com/eclipse/swtchart/pull/215/commits/b8214bd422205386e5470af2498dbd8227f87d8c
-					 */
-					double value = parse(currentLabel);
-					double diff = Math.abs((value - tickLabelValues.get(i)) / value);
-					double maximumDelta = 0.01;
-					isMajorTick = (diff <= maximumDelta);
-				} catch(ParseException e) {
-					// label is not decimal value but string
-				}
-			}
-			if(hasSpaceToDraw && isMajorTick) {
-				previousPosition = tickLabelPositions.get(i);
-			} else {
-				tickVisibilities.set(i, Boolean.FALSE);
-			}
-		}
-	}
+      // initialize the array of tick label visibility state
+      tickVisibilities.clear();
+      for(int i = 0; i < tickLabelPositions.size(); i++)
+      {
+         tickVisibilities.add(Boolean.TRUE);
+      }
+
+      if (tickLabelPositions.size() == 0 || axis.getTick().getTickLabelAngle() != 0)
+      {
+         return;
+      }
+
+      // set the tick label visibility
+      int previousPosition = 0;
+      for(int i = 0; i < tickLabelPositions.size(); i++)
+      {
+         // check if there is enough space to draw tick label
+         boolean hasSpaceToDraw = true;
+         if (i != 0)
+         {
+            hasSpaceToDraw = hasSpaceToDraw(previousPosition, tickLabelPositions.get(i), tickLabels.get(i));
+         }
+
+         // check if the tick label value is major
+         boolean isMajorTick = true;
+         if (!axis.isValidCategoryAxis())
+         {
+            if (axis.isLogScaleEnabled())
+            {
+               isMajorTick = isMajorTick(tickLabelValues.get(i));
+            }
+
+            // check if the same tick label is repeated
+            String currentLabel = tickLabels.get(i);
+            try
+            {
+               /*
+                * Check if the value is close to the tick label, then it is a major tick Patch by MatthewKhouzam
+                * https://github.com/eclipse/swtchart/pull/215/commits/b8214bd422205386e5470af2498dbd8227f87d8c
+                */
+               double value = parse(currentLabel);
+               double diff = Math.abs((value - tickLabelValues.get(i)) / value);
+               double maximumDelta = 0.01;
+               isMajorTick = (diff <= maximumDelta);
+            }
+            catch(ParseException e)
+            {
+               // label is not decimal value but string
+            }
+         }
+
+         if (hasSpaceToDraw && isMajorTick)
+         {
+            previousPosition = tickLabelPositions.get(i);
+         }
+         else
+         {
+            tickVisibilities.set(i, Boolean.FALSE);
+         }
+      }
+   }
 
 	/**
 	 * Formats the given object.
 	 * 
-	 * @param obj
-	 *            the object
+	 * @param obj the object
+	 * @param tickStep step of one tick
 	 * @return the formatted string
 	 */
-	private String format(Object obj) {
-
-		if(format == null) {
-			return new DecimalFormat(DEFAULT_DECIMAL_FORMAT).format(obj);
+	private String format(Object obj, double tickStep)
+	{
+		if (format == null)
+		{
+			if (axis.isUseMultipliers())
+			   return roundDecimalValue((Double)obj, tickStep, 5);
+			else
+			   return new DecimalFormat(DEFAULT_DECIMAL_FORMAT).format(obj);
 		}
 		return format.format(obj);
 	}
 
-	private double parse(String label) throws ParseException {
-
-		if(format == null) {
+	/**
+	 * Parse label as value
+	 *
+	 * @param label label text
+	 * @return numeric value
+	 * @throws ParseException
+	 */
+	private double parse(String label) throws ParseException
+	{
+		if (format == null)
+		{
+		   for(int i = 1; i < DECIMAL_SUFFIXES.length; i++)
+		   {
+		      if (label.endsWith(DECIMAL_SUFFIXES[i]))
+		         return new DecimalFormat(DEFAULT_DECIMAL_FORMAT).parse(label.substring(0, label.length() - DECIMAL_SUFFIXES[i].length())).doubleValue() * DECIMAL_MULTIPLIERS[i];
+		   }
+         for(int i = 1; i < BINARY_SUFFIXES.length; i++)
+         {
+            if (label.endsWith(BINARY_SUFFIXES[i]))
+               return new DecimalFormat(DEFAULT_DECIMAL_FORMAT).parse(label.substring(0, label.length() - BINARY_SUFFIXES[i].length())).doubleValue() * BINARY_MULTIPLIERS[i];
+         }
 			return new DecimalFormat(DEFAULT_DECIMAL_FORMAT).parse(label).doubleValue();
 		}
+
 		Object parsed = format.parseObject(label);
-		if(!(parsed instanceof Number))
+		if (!(parsed instanceof Number))
 			throw new ParseException(label, 0);
 		return ((Number)parsed).doubleValue();
 	}
@@ -386,34 +454,34 @@ public class AxisTickLabels implements PaintListener {
 	/**
 	 * Checks if the tick label is major (...,0.01,0.1,1,10,100,...).
 	 * 
-	 * @param tickValue
-	 *            the tick label value
+	 * @param tickValue the tick label value
 	 * @return true if the tick label is major
 	 */
-	private boolean isMajorTick(double tickValue) {
+	private boolean isMajorTick(double tickValue)
+	{
+		if (!axis.isLogScaleEnabled())
+		{
+			return true;
+		}
 
-		if(!axis.isLogScaleEnabled()) {
+		if (Math.log10(tickValue) % 1 == 0)
+		{
 			return true;
 		}
-		if(Math.log10(tickValue) % 1 == 0) {
-			return true;
-		}
+
 		return false;
 	}
 
 	/**
 	 * Returns the state indicating if there is a space to draw tick label.
 	 * 
-	 * @param previousPosition
-	 *            the previously drawn tick label position.
-	 * @param tickLabelPosition
-	 *            the tick label position.
-	 * @param tickLabel
-	 *            the tick label text
+	 * @param previousPosition the previously drawn tick label position.
+	 * @param tickLabelPosition the tick label position.
+	 * @param tickLabel the tick label text
 	 * @return true if there is a space to draw tick label
 	 */
-	private boolean hasSpaceToDraw(int previousPosition, int tickLabelPosition, String tickLabel) {
-
+	private boolean hasSpaceToDraw(int previousPosition, int tickLabelPosition, String tickLabel)
+	{
 		Point p = Util.getExtentInGC(axis.getTick().getFont(), tickLabel);
 		int interval = Math.abs(tickLabelPosition - previousPosition);
 		int textLength = axis.isHorizontalAxis() ? p.x : p.y;
@@ -555,52 +623,72 @@ public class AxisTickLabels implements PaintListener {
 		// e.g. 724.1 --> 7.241 * 10 ** 2
 		double mantissa = gridStepHint;
 		int exponent = 0;
-		if(mantissa < 1) {
-			while(mantissa < 1) {
+		if (mantissa < 1)
+		{
+			while(mantissa < 1)
+			{
 				mantissa *= 10.0;
 				exponent--;
 			}
-		} else {
-			while(mantissa >= 10) {
+		}
+		else
+		{
+			while(mantissa >= 10)
+			{
 				mantissa /= 10.0;
 				exponent++;
 			}
 		}
-		// calculate the grid step with hint.
-		BigDecimal gridStep;
-		if(mantissa > 7.5) {
-			// gridStep = 10.0 * 10 ** exponent
-			gridStep = BigDecimal.TEN.multiply(pow(10, exponent));
-		} else if(mantissa > 3.5) {
-			// gridStep = 5.0 * 10 ** exponent
-			gridStep = BigDecimal.valueOf(5).multiply(pow(10, exponent));
-		} else if(mantissa > 1.5) {
-			// gridStep = 2.0 * 10 ** exponent
-			gridStep = BigDecimal.valueOf(2).multiply(pow(10, exponent));
-		} else {
-			// gridStep = 1.0 * 10 ** exponent
-			gridStep = pow(10, exponent);
-		}
+
+      // calculate the grid step with hint.
+      BigDecimal gridStep;
+      if (mantissa > 7.5)
+      {
+         // gridStep = 10.0 * 10 ** exponent
+         gridStep = BigDecimal.TEN.multiply(pow(10, exponent));
+      }
+      else if (mantissa > 3.5)
+      {
+         // gridStep = 5.0 * 10 ** exponent
+         gridStep = BigDecimal.valueOf(5).multiply(pow(10, exponent));
+      }
+      else if (mantissa > 1.5)
+      {
+         // gridStep = 2.0 * 10 ** exponent
+         gridStep = BigDecimal.valueOf(2).multiply(pow(10, exponent));
+      }
+      else
+      {
+         // gridStep = 1.0 * 10 ** exponent
+         gridStep = pow(10, exponent);
+      }
+
 		/*
 		 * Advanced calculation.
 		 */
-		if(axis.isIntegerDataPointAxis()) {
-			for(ISeries series : (ISeries[])chart.getSeriesSet().getSeries()) {
-				if(axis.getDirection() == Direction.X) {
-					if(series.getXAxisId() == axis.getId() && series.getXSeries().length != 0) {
-						int xSeriesLength = series.getXSeries().length;
-						double upper = series.getXSeries()[xSeriesLength - 1],
-								lower = series.getXSeries()[0];
-						gridStep = BigDecimal.valueOf((upper - lower) / (xSeriesLength - 1));
-					}
-				} else {
-					if(series.getYAxisId() == axis.getId() && series.getYSeries().length != 0) {
-						gridStep = BigDecimal.valueOf(1.0);
-					}
-				}
-			}
-		}
-		//
+      if (axis.isIntegerDataPointAxis())
+      {
+         for(ISeries series : (ISeries[])chart.getSeriesSet().getSeries())
+         {
+            if (axis.getDirection() == Direction.X)
+            {
+               if (series.getXAxisId() == axis.getId() && series.getXSeries().length != 0)
+               {
+                  int xSeriesLength = series.getXSeries().length;
+                  double upper = series.getXSeries()[xSeriesLength - 1], lower = series.getXSeries()[0];
+                  gridStep = BigDecimal.valueOf((upper - lower) / (xSeriesLength - 1));
+               }
+            }
+            else
+            {
+               if (series.getYAxisId() == axis.getId() && series.getYSeries().length != 0)
+               {
+                  gridStep = BigDecimal.valueOf(1.0);
+               }
+            }
+         }
+      }
+
 		return gridStep;
 	}
 
@@ -609,8 +697,8 @@ public class AxisTickLabels implements PaintListener {
 	 * 
 	 * @return the tick label positions
 	 */
-	public ArrayList<Integer> getTickLabelPositions() {
-
+	public ArrayList<Integer> getTickLabelPositions()
+	{
 		return tickLabelPositions;
 	}
 
@@ -619,22 +707,24 @@ public class AxisTickLabels implements PaintListener {
 	 * 
 	 * @return the tick label values
 	 */
-	protected ArrayList<Double> getTickLabelValues() {
-
+	protected ArrayList<Double> getTickLabelValues()
+	{
 		return tickLabelValues;
 	}
 
 	/**
 	 * Sets the font.
 	 * 
-	 * @param font
-	 *            the font
+	 * @param font the font
 	 */
-	protected void setFont(Font font) {
-
-		if(font == null) {
+	protected void setFont(Font font)
+	{
+		if (font == null)
+		{
 			this.font = DEFAULT_FONT;
-		} else {
+		}
+		else
+		{
 			this.font = font;
 		}
 	}
@@ -657,25 +747,21 @@ public class AxisTickLabels implements PaintListener {
 	 * 
 	 * @return the layout data
 	 */
-	public ChartLayoutData getLayoutData() {
-
+	public ChartLayoutData getLayoutData()
+	{
 		return new ChartLayoutData(widthHint, heightHint);
 	}
 
 	/**
 	 * Sets the bounds on chart panel.
 	 * 
-	 * @param x
-	 *            the x coordinate
-	 * @param y
-	 *            the y coordinate
-	 * @param width
-	 *            the width
-	 * @param height
-	 *            the height
+	 * @param x the x coordinate
+	 * @param y the y coordinate
+	 * @param width the width
+	 * @param height the height
 	 */
-	public void setBounds(int x, int y, int width, int height) {
-
+	public void setBounds(int x, int y, int width, int height)
+	{
 		bounds = new Rectangle(x, y, width, height);
 	}
 
@@ -684,17 +770,18 @@ public class AxisTickLabels implements PaintListener {
 	 * 
 	 * @return the bounds on chart panel
 	 */
-	public Rectangle getBounds() {
-
+	public Rectangle getBounds()
+	{
 		return bounds;
 	}
 
 	/**
 	 * Disposes the resources.
 	 */
-	protected void dispose() {
-
-		if(!chart.isDisposed()) {
+	protected void dispose()
+	{
+		if (!chart.isDisposed())
+		{
 			chart.removePaintListener(this);
 		}
 	}
@@ -702,11 +789,12 @@ public class AxisTickLabels implements PaintListener {
 	/**
 	 * Updates the tick labels layout.
 	 */
-	protected void updateLayoutData() {
-
+	protected void updateLayoutData()
+	{
 		widthHint = SWT.DEFAULT;
 		heightHint = SWT.DEFAULT;
-		if(!axis.getTick().isVisible()) {
+		if (!axis.getTick().isVisible())
+		{
 			widthHint = 0;
 			heightHint = 0;
 		} else {
@@ -718,30 +806,35 @@ public class AxisTickLabels implements PaintListener {
 		}
 	}
 
-	@Override
-	public void paintControl(PaintEvent e) {
+   /**
+    * @see org.eclipse.swt.events.PaintListener#paintControl(org.eclipse.swt.events.PaintEvent)
+    */
+   @Override
+   public void paintControl(PaintEvent e)
+   {
+      if (!axis.getTick().isVisible())
+         return;
 
-		if(!axis.getTick().isVisible()) {
-			return;
-		}
-		Color oldBackground = e.gc.getBackground();
-		e.gc.setBackground(chart.getBackground());
-		Color oldForeground = e.gc.getForeground();
-		e.gc.setForeground(getForeground());
-		if(axis.isHorizontalAxis()) {
-			drawXTick(e.gc);
-		} else {
-			drawYTick(e.gc);
-		}
-		e.gc.setBackground(oldBackground);
-		e.gc.setForeground(oldForeground);
-	}
+      Color oldBackground = e.gc.getBackground();
+      e.gc.setBackground(chart.getBackground());
+      Color oldForeground = e.gc.getForeground();
+      e.gc.setForeground(getForeground());
+      if (axis.isHorizontalAxis())
+      {
+         drawXTick(e.gc);
+      }
+      else
+      {
+         drawYTick(e.gc);
+      }
+      e.gc.setBackground(oldBackground);
+      e.gc.setForeground(oldForeground);
+   }
 
 	/**
 	 * Draw the X tick.
 	 * 
-	 * @param gc
-	 *            the graphics context
+	 * @param gc the graphics context
 	 */
 	private void drawXTick(GC gc) {
 
@@ -749,21 +842,27 @@ public class AxisTickLabels implements PaintListener {
 		// draw tick labels
 		gc.setFont(axis.getTick().getFont());
 		int angle = axis.getTick().getTickLabelAngle();
-		for(int i = 0; i < tickLabelPositions.size(); i++) {
-			if(axis.isValidCategoryAxis() || tickVisibilities.get(i) == true) {
+		for(int i = 0; i < tickLabelPositions.size(); i++)
+		{
+			if (axis.isValidCategoryAxis() || tickVisibilities.get(i))
+			{
 				String text = tickLabels.get(i);
 				int textWidth = gc.textExtent(text).x;
 				int textHeight = gc.textExtent(text).y;
-				if(angle == 0) {
-					int x = (int)(tickLabelPositions.get(i) - textWidth / 2d + offset);
-					gc.drawText(text, bounds.x + x, bounds.y);
-					continue;
-				}
+            if (angle == 0)
+            {
+               int x = (int)(tickLabelPositions.get(i) - textWidth / 2d + offset);
+               gc.drawText(text, bounds.x + x, bounds.y);
+               continue;
+            }
 				float x, y;
-				if(axis.getPosition() == Position.Primary) {
+				if (axis.getPosition() == Position.Primary)
+				{
 					x = (float)(offset + bounds.x + tickLabelPositions.get(i) - textWidth * Math.cos(Math.toRadians(angle)) - textHeight / 2d * Math.sin(Math.toRadians(angle)));
 					y = (float)(bounds.y + textWidth * Math.sin(Math.toRadians(angle)));
-				} else {
+				}
+				else
+				{
 					x = (float)(offset + bounds.x + tickLabelPositions.get(i) - textHeight / 2d * Math.sin(Math.toRadians(angle)));
 					y = (float)(bounds.y + bounds.height * Math.sin(Math.toRadians(angle)));
 				}
@@ -775,16 +874,11 @@ public class AxisTickLabels implements PaintListener {
 	/**
 	 * Draws the rotated text.
 	 * 
-	 * @param gc
-	 *            the graphics context
-	 * @param text
-	 *            the text
-	 * @param x
-	 *            the x coordinate
-	 * @param y
-	 *            the y coordinate
-	 * @param angle
-	 *            the angle
+	 * @param gc the graphics context
+	 * @param text the text
+	 * @param x the x coordinate
+	 * @param y the y coordinate
+	 * @param angle the angle
 	 */
 	private static void drawRotatedText(GC gc, String text, float x, float y, int angle) {
 
@@ -802,30 +896,34 @@ public class AxisTickLabels implements PaintListener {
 	/**
 	 * Draw the Y tick.
 	 * 
-	 * @param gc
-	 *            the graphics context
+	 * @param gc the graphics context
 	 */
-	private void drawYTick(GC gc) {
+   private void drawYTick(GC gc)
+   {
 
-		int margin = Axis.MARGIN + AxisTickMarks.TICK_LENGTH;
-		// draw tick labels
-		gc.setFont(axis.getTick().getFont());
-		int figureHeight = gc.textExtent("dummy").y; //$NON-NLS-1$
-		for(int i = 0; i < tickLabelPositions.size(); i++) {
-			if(tickVisibilities.size() == 0 || tickLabels.size() == 0) {
-				break;
-			}
-			if(tickVisibilities.get(i) == true) {
-				String text = tickLabels.get(i);
-				int x = Axis.MARGIN;
-				if(tickLabels.get(0).startsWith("-") && !text.startsWith("-")) { //$NON-NLS-1$ //$NON-NLS-2$
-					x += gc.textExtent("-").x; //$NON-NLS-1$
-				}
-				int y = (int)(bounds.height - 1 - tickLabelPositions.get(i) - figureHeight / 2.0 - margin);
-				gc.drawText(text, bounds.x + x, bounds.y + y);
-			}
-		}
-	}
+      int margin = Axis.MARGIN + AxisTickMarks.TICK_LENGTH;
+      // draw tick labels
+      gc.setFont(axis.getTick().getFont());
+      int figureHeight = gc.textExtent("dummy").y; //$NON-NLS-1$
+      for(int i = 0; i < tickLabelPositions.size(); i++)
+      {
+         if (tickVisibilities.size() == 0 || tickLabels.size() == 0)
+         {
+            break;
+         }
+         if (tickVisibilities.get(i) == true)
+         {
+            String text = tickLabels.get(i);
+            int x = Axis.MARGIN;
+            if (tickLabels.get(0).startsWith("-") && !text.startsWith("-"))
+            {
+               x += gc.textExtent("-").x;
+            }
+            int y = (int)(bounds.height - 1 - tickLabelPositions.get(i) - figureHeight / 2.0 - margin);
+            gc.drawText(text, bounds.x + x, bounds.y + y);
+         }
+      }
+   }
 
 	/**
 	 * Sets the format for axis tick label. <code>DecimalFormat</code> and
@@ -847,8 +945,8 @@ public class AxisTickLabels implements PaintListener {
 	 * 
 	 * @return the format
 	 */
-	protected Format getFormat() {
-
+	protected Format getFormat()
+	{
 		return format;
 	}
 
@@ -861,4 +959,57 @@ public class AxisTickLabels implements PaintListener {
 
 		return tickLabels;
 	}
+
+   /**
+    * Calculate precision of number
+    *
+    * @param number to calculate precision of
+    * @return decimal place count
+    */
+   private static int calculatePrecision(double number)
+   {
+      int i = 0;
+      if (number == 0 || number >= 1)
+         return i;
+      for(i = 1; i < 1000; i++)
+      {
+         if (((number) *= 10) >= 1)
+            break;
+      }
+      return i;
+   }
+
+   /**
+    * Get rounded value for chart labels
+    *
+    * @param value to round
+    * @param step of label
+    * @param maxPrecision desired precision
+    * @return rounded value
+    */
+   public static String roundDecimalValue(double value, double step, int maxPrecision)
+   {
+      if (value == 0)
+         return "0";
+
+      double absValue = Math.abs(value);
+      final long[] multipliers = DECIMAL_MULTIPLIERS;
+
+      int i;
+      for(i = multipliers.length - 1; i >= 0; i--)
+      {
+         if (absValue >= multipliers[i])
+            break;
+      }
+
+      int precision;
+      if ((step < 1) || (i < 0))
+         precision = (calculatePrecision(step) > maxPrecision) ? maxPrecision : calculatePrecision(step);
+      else
+         precision = (calculatePrecision(step / multipliers[i]) > maxPrecision) ? maxPrecision : calculatePrecision(step / multipliers[i]);
+
+      DecimalFormat df = new DecimalFormat();
+      df.setMaximumFractionDigits(precision);
+      return df.format((i < 0 ? value : (value / multipliers[i]))) + (i < 0 ? "" : DECIMAL_SUFFIXES[i]);
+   }
 }
