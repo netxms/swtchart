@@ -326,18 +326,30 @@ public class LineSeries<T> extends Series<T> implements ILineSeries<T> {
 		int x2 = xAxis.getPixelCoordinate(xseries[index + 1]);
 		int x3 = x2;
 		int x4 = x1;
-		int y1 = yAxis.getPixelCoordinate(yseries[index]);
-		int y2 = yAxis.getPixelCoordinate(yseries[index + 1]);
+		int y1 = yAxis.getPixelCoordinate(inverted ? -yseries[index] : yseries[index]);
+		int y2 = yAxis.getPixelCoordinate(inverted ? -yseries[index + 1] : yseries[index + 1]);
 		int y3, y4;
 		double baseYCoordinate = yAxis.getRange().lower > 0 ? yAxis.getRange().lower : 0;
 		if(yAxis.isLogScaleEnabled()) {
 			y3 = yAxis.getPixelCoordinate(yAxis.getRange().lower);
 			y4 = y3;
 		} else if(isValidStackSeries()) {
-			y1 = yAxis.getPixelCoordinate(stackSeries[indexes[index]]);
-			y2 = yAxis.getPixelCoordinate(stackSeries[indexes[index + 1]]);
-			y3 = yAxis.getPixelCoordinate(stackSeries[indexes[index + 1]]) + Math.abs(yAxis.getPixelCoordinate(yseries[index + 1]) - yAxis.getPixelCoordinate(0)) * (xAxis.isHorizontalAxis() ? 1 : -1);
-			y4 = yAxis.getPixelCoordinate(stackSeries[indexes[index]]) + Math.abs(yAxis.getPixelCoordinate(yseries[index]) - yAxis.getPixelCoordinate(0)) * (xAxis.isHorizontalAxis() ? 1 : -1);
+			y1 = yAxis.getPixelCoordinate(inverted ? -stackSeries[indexes[index]] : stackSeries[indexes[index]]);
+			y2 = yAxis.getPixelCoordinate(inverted ? -stackSeries[indexes[index + 1]] : stackSeries[indexes[index + 1]]);
+         if (inverted)
+         {
+            y3 = yAxis.getPixelCoordinate(-stackSeries[indexes[index + 1]])
+                  - Math.abs(yAxis.getPixelCoordinate(-yseries[index + 1]) - yAxis.getPixelCoordinate(0))
+                  * (xAxis.isHorizontalAxis() ? 1 : -1);
+            y4 = yAxis.getPixelCoordinate(-stackSeries[indexes[index]])
+                  - Math.abs(yAxis.getPixelCoordinate(-yseries[index]) - yAxis.getPixelCoordinate(0))
+                  * (xAxis.isHorizontalAxis() ? 1 : -1);
+         }
+         else
+         {
+            y3 = yAxis.getPixelCoordinate(stackSeries[indexes[index + 1]]) + Math.abs(yAxis.getPixelCoordinate(yseries[index + 1]) - yAxis.getPixelCoordinate(0)) * (xAxis.isHorizontalAxis() ? 1 : -1);
+            y4 = yAxis.getPixelCoordinate(stackSeries[indexes[index]]) + Math.abs(yAxis.getPixelCoordinate(yseries[index]) - yAxis.getPixelCoordinate(0)) * (xAxis.isHorizontalAxis() ? 1 : -1);
+         }
 		} else {
 			y3 = yAxis.getPixelCoordinate(baseYCoordinate);
 			y4 = y3;
@@ -397,7 +409,8 @@ public class LineSeries<T> extends Series<T> implements ILineSeries<T> {
 		Color oldForeground = gc.getForeground();
 		gc.setForeground(getLineColor());
 		boolean isHorizontal = xAxis.isHorizontalAxis();
-		if(stepEnabled || areaEnabled || stackEnabled) {
+		if(stepEnabled || areaEnabled || stackEnabled)
+      {
 			for(int i = 0; i < xseries.length - 1; i++) {
 				int[] p = getLinePoints(xseries, yseries, indexes, i, xAxis, yAxis);
 				// draw line
@@ -419,10 +432,15 @@ public class LineSeries<T> extends Series<T> implements ILineSeries<T> {
 					drawArea(gc, p, isHorizontal);
 				}
 			}
-		} else {
-			if(lineStyle == LineStyle.SOLID) {
+		}
+      else
+      {
+			if (lineStyle == LineStyle.SOLID)
+         {
 				drawLine(gc, xAxis, yAxis, xseries, yseries, isHorizontal);
-			} else if(lineStyle != LineStyle.NONE) {
+			}
+         else if(lineStyle != LineStyle.NONE)
+         {
 				drawLineWithStyle(gc, xAxis, yAxis, xseries, yseries, isHorizontal);
 			}
 		}
