@@ -301,7 +301,7 @@ abstract public class Series<T> implements ISeries<T> {
 	 */
 	public boolean isValidStackSeries() {
 
-		return stackEnabled && stackSeries != null && stackSeries.length > 0 && !chart.getAxisSet().getYAxis(yAxisId).isLogScaleEnabled() && ((Axis)chart.getAxisSet().getXAxis(xAxisId)).isValidCategoryAxis();
+		return stackEnabled && stackSeries != null && stackSeries.length > 0 && !chart.getAxisSet().getYAxis(yAxisId).isLogScaleEnabled();
 	}
 
 	/**
@@ -352,7 +352,7 @@ abstract public class Series<T> implements ISeries<T> {
 			max = number == null ? 0 : number.doubleValue();
 		}
 		Axis xAxis = (Axis)chart.getAxisSet().getXAxis(xAxisId);
-		if(isValidStackSeries() && xAxis.isValidCategoryAxis()) {
+		if(isValidStackSeries()) {
 			for(int i = 0; i < stackSeries.length; i++) {
 				if(max < stackSeries[i]) {
 					max = stackSeries[i];
