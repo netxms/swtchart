@@ -98,17 +98,21 @@ public class LineSeries<T> extends Series<T> implements ILineSeries<T>
       compressor = new CompressLineSeries();
    }
 
+   /**
+    * @see org.eclipse.swtchart.ILineSeries#getLineStyle()
+    */
    @Override
    public LineStyle getLineStyle()
    {
-
       return lineStyle;
    }
 
+   /**
+    * @see org.eclipse.swtchart.ILineSeries#setLineStyle(org.eclipse.swtchart.LineStyle)
+    */
    @Override
    public void setLineStyle(LineStyle style)
    {
-
       if (style == null)
       {
          this.lineStyle = DEFAULT_LINE_STYLE;
@@ -121,10 +125,12 @@ public class LineSeries<T> extends Series<T> implements ILineSeries<T>
       }
    }
 
+   /**
+    * @see org.eclipse.swtchart.ILineSeries#getLineColor()
+    */
    @Override
    public Color getLineColor()
    {
-
       if (lineColor.isDisposed())
       {
          lineColor = Display.getDefault().getSystemColor(DEFAULT_LINE_COLOR);
@@ -132,10 +138,12 @@ public class LineSeries<T> extends Series<T> implements ILineSeries<T>
       return lineColor;
    }
 
+   /**
+    * @see org.eclipse.swtchart.ILineSeries#setLineColor(org.eclipse.swt.graphics.Color)
+    */
    @Override
    public void setLineColor(Color color)
    {
-
       if (color != null && color.isDisposed())
       {
          SWT.error(SWT.ERROR_INVALID_ARGUMENT);
@@ -150,17 +158,21 @@ public class LineSeries<T> extends Series<T> implements ILineSeries<T>
       }
    }
 
+   /**
+    * @see org.eclipse.swtchart.ILineSeries#getLineWidth()
+    */
    @Override
    public int getLineWidth()
    {
-
       return lineWidth;
    }
 
+   /**
+    * @see org.eclipse.swtchart.ILineSeries#setLineWidth(int)
+    */
    @Override
    public void setLineWidth(int width)
    {
-
       if (width <= 0)
       {
          this.lineWidth = DEFAULT_LINE_WIDTH;
@@ -171,17 +183,21 @@ public class LineSeries<T> extends Series<T> implements ILineSeries<T>
       }
    }
 
+   /**
+    * @see org.eclipse.swtchart.ILineSeries#getSymbolType()
+    */
    @Override
    public PlotSymbolType getSymbolType()
    {
-
       return symbolType;
    }
 
+   /**
+    * @see org.eclipse.swtchart.ILineSeries#setSymbolType(org.eclipse.swtchart.ILineSeries.PlotSymbolType)
+    */
    @Override
    public void setSymbolType(PlotSymbolType type)
    {
-
       if (type == null)
       {
          this.symbolType = DEFAULT_SYMBOL_TYPE;
@@ -192,31 +208,39 @@ public class LineSeries<T> extends Series<T> implements ILineSeries<T>
       }
    }
 
+   /**
+    * @see org.eclipse.swtchart.ILineSeries#getExtendedPlotSymbolType()
+    */
    @Override
    public String getExtendedPlotSymbolType()
    {
-
       return extendedSymbolType;
    }
 
+   /**
+    * @see org.eclipse.swtchart.ILineSeries#setExtendedPlotSymbolType(java.lang.String)
+    */
    @Override
    public void setExtendedPlotSymbolType(String type)
    {
-
       extendedSymbolType = type;
    }
 
+   /**
+    * @see org.eclipse.swtchart.ILineSeries#getSymbolSize()
+    */
    @Override
    public int getSymbolSize()
    {
-
       return symbolSize;
    }
 
+   /**
+    * @see org.eclipse.swtchart.ILineSeries#setSymbolSize(int)
+    */
    @Override
    public void setSymbolSize(int size)
    {
-
       if (size <= 0)
       {
          this.symbolSize = DEFAULT_SIZE;
@@ -227,17 +251,21 @@ public class LineSeries<T> extends Series<T> implements ILineSeries<T>
       }
    }
 
+   /**
+    * @see org.eclipse.swtchart.ILineSeries#getSymbolColor()
+    */
    @Override
    public Color getSymbolColor()
    {
-
       return symbolColor;
    }
 
+   /**
+    * @see org.eclipse.swtchart.ILineSeries#setSymbolColor(org.eclipse.swt.graphics.Color)
+    */
    @Override
    public void setSymbolColor(Color color)
    {
-
       if (color != null && color.isDisposed())
       {
          SWT.error(SWT.ERROR_INVALID_ARGUMENT);
@@ -252,6 +280,9 @@ public class LineSeries<T> extends Series<T> implements ILineSeries<T>
       }
    }
 
+   /**
+    * @see org.eclipse.swtchart.ILineSeries#getSymbolColors()
+    */
    @Override
    public Color[] getSymbolColors()
    {
@@ -261,6 +292,9 @@ public class LineSeries<T> extends Series<T> implements ILineSeries<T>
       return copiedSymbolColors;
    }
 
+   /**
+    * @see org.eclipse.swtchart.ILineSeries#setSymbolColors(org.eclipse.swt.graphics.Color[])
+    */
    @Override
    public void setSymbolColors(Color[] colors)
    {
@@ -281,6 +315,9 @@ public class LineSeries<T> extends Series<T> implements ILineSeries<T>
       System.arraycopy(colors, 0, symbolColors, 0, colors.length);
    }
 
+   /**
+    * @see org.eclipse.swtchart.internal.series.Series#setCompressor()
+    */
    @Override
    protected void setCompressor()
    {
@@ -421,7 +458,6 @@ public class LineSeries<T> extends Series<T> implements ILineSeries<T>
    @Override
    protected void draw(GC gc, int width, int height, Axis xAxis, Axis yAxis)
    {
-
       int oldAntialias = gc.getAntialias();
       int oldLineWidth = gc.getLineWidth();
       gc.setAntialias(antialias);
@@ -525,21 +561,21 @@ public class LineSeries<T> extends Series<T> implements ILineSeries<T>
     * minimize the risk of side effect, this method remains for solid line style until that bug is fixed and the workaround is
     * removed.
     */
-   private static void drawLine(GC gc, Axis xAxis, Axis yAxis, double[] xseries, double[] yseries, boolean isHorizontal)
+   private void drawLine(GC gc, Axis xAxis, Axis yAxis, double[] xseries, double[] yseries, boolean isHorizontal)
    {
       double xLower = xAxis.getRange().lower;
       double xUpper = xAxis.getRange().upper;
       double yLower = yAxis.getRange().lower;
       double yUpper = yAxis.getRange().upper;
       int prevX = xAxis.getPixelCoordinate(xseries[0], xLower, xUpper);
-      int prevY = yAxis.getPixelCoordinate(yseries[0], yLower, yUpper);
+      int prevY = yAxis.getPixelCoordinate(inverted ? -yseries[0] : yseries[0], yLower, yUpper);
       boolean drawVerticalLine = false;
       int verticalLineYLower = 0;
       int verticalLineYUpper = 0;
       for(int i = 0; i < xseries.length - 1; i++)
       {
          int x = xAxis.getPixelCoordinate(xseries[i + 1], xLower, xUpper);
-         int y = yAxis.getPixelCoordinate(yseries[i + 1], yLower, yUpper);
+         int y = yAxis.getPixelCoordinate(inverted ? -yseries[i + 1] : yseries[i + 1], yLower, yUpper);
          if (x == prevX && i < xseries.length - 2)
          {
             if (drawVerticalLine)
@@ -602,7 +638,7 @@ public class LineSeries<T> extends Series<T> implements ILineSeries<T>
     * @param yseries the y series
     * @param isHorizontal true if orientation is horizontal
     */
-   private static void drawLineWithStyle(GC gc, Axis xAxis, Axis yAxis, double[] xseries, double[] yseries, boolean isHorizontal)
+   private void drawLineWithStyle(GC gc, Axis xAxis, Axis yAxis, double[] xseries, double[] yseries, boolean isHorizontal)
    {
       double xLower = xAxis.getRange().lower;
       double xUpper = xAxis.getRange().upper;
@@ -610,7 +646,7 @@ public class LineSeries<T> extends Series<T> implements ILineSeries<T>
       double yUpper = yAxis.getRange().upper;
       List<Integer> pointList = new ArrayList<Integer>();
       int prevX = xAxis.getPixelCoordinate(xseries[0], xLower, xUpper);
-      int prevY = yAxis.getPixelCoordinate(yseries[0], yLower, yUpper);
+      int prevY = yAxis.getPixelCoordinate(inverted ? -yseries[0] : yseries[0], yLower, yUpper);
       // add initial point
       addPoint(pointList, prevX, prevY, isHorizontal);
       boolean drawVerticalLine = false;
@@ -619,7 +655,7 @@ public class LineSeries<T> extends Series<T> implements ILineSeries<T>
       for(int i = 0; i < xseries.length - 1; i++)
       {
          int x = xAxis.getPixelCoordinate(xseries[i + 1], xLower, xUpper);
-         int y = yAxis.getPixelCoordinate(yseries[i + 1], yLower, yUpper);
+         int y = yAxis.getPixelCoordinate(inverted ? -yseries[i + 1] : yseries[i + 1], yLower, yUpper);
          if (x == prevX && i < xseries.length - 2)
          {
             if (drawVerticalLine)
@@ -687,7 +723,6 @@ public class LineSeries<T> extends Series<T> implements ILineSeries<T>
     */
    private void drawArea(GC gc, int[] p, boolean isHorizontal)
    {
-
       int alpha = gc.getAlpha();
       gc.setAlpha(chart.isTranslucent() ? ALPHA : 255);
       Color oldBackground = gc.getBackground();
@@ -724,7 +759,6 @@ public class LineSeries<T> extends Series<T> implements ILineSeries<T>
     */
    private void drawSymbolAndLabel(GC gc, int width, int height, Axis xAxis, Axis yAxis)
    {
-
       // get x and y series
       double[] xseries = compressor.getCompressedXSeries();
       double[] yseries = compressor.getCompressedYSeries();
@@ -784,7 +818,6 @@ public class LineSeries<T> extends Series<T> implements ILineSeries<T>
     */
    public void drawSeriesSymbol(GC gc, int h, int v, Color color)
    {
-
       int oldAntialias = gc.getAntialias();
       gc.setAntialias(SWT.ON);
       Color oldForeground = gc.getForeground();

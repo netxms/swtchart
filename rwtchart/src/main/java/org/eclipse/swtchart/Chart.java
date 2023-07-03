@@ -493,7 +493,7 @@ public class Chart extends Canvas implements Listener {
 	}
 
 	/**
-	 * @see org.eclipse.swt.widgets.Control#addPaintListener(org.eclipse.swt.events.PaintListener)
+	 * @see org.eclipse.swt.widgets.Canvas#addPaintListener(org.eclipse.swt.events.PaintListener)
 	 */
 	@Override
 	public void addPaintListener(PaintListener listener) {
@@ -503,7 +503,7 @@ public class Chart extends Canvas implements Listener {
 	}
 
 	/**
-	 * @see org.eclipse.swt.widgets.Control#removePaintListener(org.eclipse.swt.events.PaintListener)
+	 * @see org.eclipse.swt.widgets.Canvas#removePaintListener(org.eclipse.swt.events.PaintListener)
 	 */
 	@Override
 	public void removePaintListener(PaintListener listener) {
