@@ -339,7 +339,6 @@ public class AxisTickLabels implements PaintListener
 	 */
    private void updateTickVisibility()
    {
-
       // initialize the array of tick label visibility state
       tickVisibilities.clear();
       for(int i = 0; i < tickLabelPositions.size(); i++)
@@ -381,9 +380,12 @@ public class AxisTickLabels implements PaintListener
                 * https://github.com/eclipse/swtchart/pull/215/commits/b8214bd422205386e5470af2498dbd8227f87d8c
                 */
                double value = parse(currentLabel);
-               double diff = Math.abs((value - tickLabelValues.get(i)) / value);
-               double maximumDelta = 0.01;
-               isMajorTick = (diff <= maximumDelta);
+               if (value != 0)
+               {
+                  double diff = Math.abs((value - tickLabelValues.get(i)) / value);
+                  double maximumDelta = 0.01;
+                  isMajorTick = (diff <= maximumDelta);
+               }
             }
             catch(ParseException e)
             {
