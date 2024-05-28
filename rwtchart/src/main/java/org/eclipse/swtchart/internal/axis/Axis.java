@@ -16,7 +16,6 @@ package org.eclipse.swtchart.internal.axis;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swtchart.Chart;
@@ -42,7 +41,7 @@ public class Axis implements IAxis
 	/** the default maximum value of range */
 	public final static double DEFAULT_MAX = 1d;
 	/** the default minimum value of log scale range */
-	public final static double DEFAULT_LOG_SCALE_MIN = 0.1d;
+	public final static double DEFAULT_LOG_SCALE_MIN = 0;
 	/** the default maximum value of log scale range */
 	public final static double DEFAULT_LOG_SCALE_MAX = 1d;
 	/** the ratio to be zoomed */
@@ -92,15 +91,15 @@ public class Axis implements IAxis
 	/** the list of dispose listeners */
 	private List<IDisposeListener> listeners;
 
-	/**
+   /**
 	 * Constructor.
 	 * 
 	 * @param id
-	 *            the axis index
+	 *           the axis index
 	 * @param direction
-	 *            the axis direction (X or Y)
+	 *           the axis direction (X or Y)
 	 * @param chart
-	 *            the chart
+	 *           the chart
 	 */
 	public Axis(int id, Direction direction, Chart chart) {
 		this.id = id;
@@ -244,24 +243,45 @@ public class Axis implements IAxis
 	}
 
 	@Override
-	public void enableLogScale(boolean enabled) throws IllegalStateException {
+	public void enableLogScale(boolean enabled) throws IllegalStateException
+	{
 
 		if(logScaleEnabled == enabled) {
 			return;
 		}
-		if(enabled) {
-			// check if series contain zero or negative value
-			double minSeriesValue = getMinSeriesValue();
-			if(minSeriesValue <= 0) {
-				throw new IllegalStateException(Messages.getString(Messages.SERIES_CONTAIN_INVALID_VALUES));
+		if (enabled)
+		{
+			if (chart.getSeriesSet().getSeries().length == 0)
+			{
+				if (min <= 0)
+				{
+					min = DEFAULT_LOG_SCALE_MIN;
+				}
+				if (max < min)
+				{
+					max = DEFAULT_LOG_SCALE_MAX;
+				}
 			}
-			// adjust the range in order not to have zero or negative value
-			if(min <= 0) {
-				min = Double.isNaN(minSeriesValue) ? DEFAULT_LOG_SCALE_MIN : minSeriesValue;
+			else
+			{
+				// check if series contain negative value
+				double minSeriesValue = getMinSeriesValue();
+				if (minSeriesValue < 0)
+				{
+					throw new IllegalStateException(Messages.getString(Messages.SERIES_CONTAIN_INVALID_VALUES));
+				}
+
+				// adjust the range in order not to have negative value
+				if (min < 0)
+				{
+					min = Double.isNaN(minSeriesValue) ? DEFAULT_LOG_SCALE_MIN : minSeriesValue;
+				}
+				if(max < min)
+				{
+					max = DEFAULT_LOG_SCALE_MAX;
+				}
 			}
-			if(max < min) {
-				max = DEFAULT_LOG_SCALE_MAX;
-			}
+
 			// disable category axis
 			if(categoryAxisEnabled) {
 				categoryAxisEnabled = false;
@@ -586,7 +606,8 @@ public class Axis implements IAxis
 		if(isReversed()) {
 			if(isHorizontalAxis) {
 				if(logScaleEnabled) {
-					pixelCoordinate = (int)((Math.log10(upper) - Math.log10(dataCoordinate)) / (Math.log10(upper) - Math.log10(lower)) * width);
+			   	double logLower = Math.log10((lower == 0) ? Math.min(0.1, upper / 10.0) : lower);
+					pixelCoordinate = (dataCoordinate == 0) ? width : (int)((Math.log10(dataCoordinate) - logLower) / (Math.log10(upper) - logLower) * width);
 				} else if(categoryAxisEnabled) {
 					pixelCoordinate = (int)((upper - dataCoordinate + 0.5) / (upper + 1 - lower) * width);
 				} else {
@@ -594,7 +615,8 @@ public class Axis implements IAxis
 				}
 			} else {
 				if(logScaleEnabled) {
-					pixelCoordinate = (int)((Math.log10(dataCoordinate) - Math.log10(lower)) / (Math.log10(upper) - Math.log10(lower)) * height);
+	            double logLower = Math.log10((lower == 0) ? Math.min(0.1, upper / 10.0) : lower);
+					pixelCoordinate = (dataCoordinate == 0) ? 0 : (int)((Math.log10(upper) - Math.log10(dataCoordinate)) / (Math.log10(upper) - logLower) * height);
 				} else if(categoryAxisEnabled) {
 					pixelCoordinate = (int)((dataCoordinate + 0.5 - lower) / (upper + 1 - lower) * height);
 				} else {
@@ -604,7 +626,8 @@ public class Axis implements IAxis
 		} else {
 			if(isHorizontalAxis) {
 				if(logScaleEnabled) {
-					pixelCoordinate = (int)((Math.log10(dataCoordinate) - Math.log10(lower)) / (Math.log10(upper) - Math.log10(lower)) * width);
+				   double logLower = Math.log10((lower == 0) ? Math.min(0.1, upper / 10.0) : lower);
+					pixelCoordinate = (dataCoordinate == 0) ? 0 : (int)((Math.log10(dataCoordinate) - logLower) / (Math.log10(upper) - logLower) * width);
 				} else if(categoryAxisEnabled) {
 					pixelCoordinate = (int)((dataCoordinate + 0.5 - lower) / (upper + 1 - lower) * width);
 				} else {
@@ -612,7 +635,8 @@ public class Axis implements IAxis
 				}
 			} else {
 				if(logScaleEnabled) {
-					pixelCoordinate = (int)((Math.log10(upper) - Math.log10(dataCoordinate)) / (Math.log10(upper) - Math.log10(lower)) * height);
+	            double logLower = Math.log10((lower == 0) ? Math.min(0.1, upper / 10.0) : lower);
+					pixelCoordinate = (dataCoordinate == 0) ? height : (int)((Math.log10(upper) - Math.log10(dataCoordinate)) / (Math.log10(upper) - logLower) * height);
 				} else if(categoryAxisEnabled) {
 					pixelCoordinate = (int)((upper - dataCoordinate + 0.5) / (upper + 1 - lower) * height);
 				} else {
@@ -647,7 +671,8 @@ public class Axis implements IAxis
 		if(isReversed()) {
 			if(isHorizontalAxis) {
 				if(logScaleEnabled) {
-					dataCoordinate = Math.pow(10, Math.log10(upper) - pixelCoordinate / (double)width * (Math.log10(upper) - Math.log10(lower)) + Math.log10(lower));
+				   double logLower = Math.log10((lower == 0) ? Math.min(0.1, upper / 10.0) : lower);
+					dataCoordinate = Math.pow(10, Math.log10(upper) - pixelCoordinate / (double)width * (Math.log10(upper) - logLower) + logLower);
 				} else if(categoryAxisEnabled) {
 					dataCoordinate = Math.floor(upper + 1 - pixelCoordinate / (double)width * (upper + 1 - lower) + lower);
 				} else {
@@ -655,7 +680,8 @@ public class Axis implements IAxis
 				}
 			} else {
 				if(logScaleEnabled) {
-					dataCoordinate = Math.pow(10, pixelCoordinate / (double)height * (Math.log10(upper) - Math.log10(lower)));
+               double logLower = Math.log10((lower == 0) ? Math.min(0.1, upper / 10.0) : lower);
+					dataCoordinate = Math.pow(10, pixelCoordinate / (double)height * (Math.log10(upper) - logLower));
 				} else if(categoryAxisEnabled) {
 					dataCoordinate = Math.floor(pixelCoordinate / (double)height * (upper + 1 - lower));
 				} else {
@@ -665,7 +691,8 @@ public class Axis implements IAxis
 		} else {
 			if(isHorizontalAxis) {
 				if(logScaleEnabled) {
-					dataCoordinate = Math.pow(10, pixelCoordinate / (double)width * (Math.log10(upper) - Math.log10(lower)) + Math.log10(lower));
+               double logLower = Math.log10((lower == 0) ? Math.min(0.1, upper / 10.0) : lower);
+					dataCoordinate = Math.pow(10, pixelCoordinate / (double)width * (Math.log10(upper) - logLower) + logLower);
 				} else if(categoryAxisEnabled) {
 					dataCoordinate = Math.floor(pixelCoordinate / (double)width * (upper + 1 - lower) + lower);
 				} else {
@@ -673,7 +700,8 @@ public class Axis implements IAxis
 				}
 			} else {
 				if(logScaleEnabled) {
-					dataCoordinate = Math.pow(10, Math.log10(upper) - pixelCoordinate / (double)height * (Math.log10(upper) - Math.log10(lower)));
+               double logLower = Math.log10((lower == 0) ? Math.min(0.1, upper / 10.0) : lower);
+					dataCoordinate = Math.pow(10, Math.log10(upper) - pixelCoordinate / (double)height * (Math.log10(upper) - logLower));
 				} else if(categoryAxisEnabled) {
 					dataCoordinate = Math.floor(upper + 1 - pixelCoordinate / (double)height * (upper + 1 - lower));
 				} else {
