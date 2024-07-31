@@ -9,17 +9,46 @@
 
    <name>rwtchart</name>
    <description>NetXMS fork of SWT Chart Library for RWT</description>
+   <url>https://github.com/netxms/swtchart</url>
 
    <properties>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
       <lib.scope>provided</lib.scope>
    </properties>
 
+   <licenses>
+      <license>
+         <name>Eclipse Public License 2.0</name>
+         <url>https://www.eclipse.org/legal/epl-2.0/</url>
+      </license>
+   </licenses>
+
+   <scm>
+      <connection>scm:git:https://github.com/netxms/swtchart</connection>
+      <developerConnection>scm:git:ssh://github.com/netxms/swtchart.git</developerConnection>
+      <url>https://github.com/netxms/swtchart</url>
+   </scm>
+   <developers>
+      <developer>
+         <id>alex.kirhenshtein</id>
+         <name>Alex Kirhenshtein</name>
+         <email>alk@netxms.org</email>
+         <organization>Raden Solutions</organization>
+         <organizationUrl>https://radensolutions.com</organizationUrl>
+         <roles>
+            <role>developer</role>
+         </roles>
+         <timezone>Europe/Riga</timezone>
+      </developer>
+   </developers>
+   <issueManagement>
+      <system>GitHub Issues</system>
+      <url>https://github.com/netxms/swtchart/issues</url>
+   </issueManagement>
    <distributionManagement>
       <repository>
-         <id>netxms-nexus</id>
-         <name>NetXMS Repository</name>
-         <url>https://nexus.netxms.org/repository/maven-releases/</url>
+         <id>ossrh</id>
+         <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
       </repository>
    </distributionManagement>
 
@@ -46,8 +75,7 @@
             <artifactId>maven-compiler-plugin</artifactId>
             <version>3.11.0</version>
             <configuration>
-               <source>11</source>
-               <target>11</target>
+               <release>11</release>
             </configuration>
          </plugin>
          <plugin>
@@ -75,6 +103,23 @@
                   </goals>
                </execution>
             </executions>
+         </plugin>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>3.2.4</version>
+            <executions>
+               <execution>
+                  <id>sign-artifacts</id>
+                  <phase>verify</phase>
+                  <goals>
+                     <goal>sign</goal>
+                  </goals>
+               </execution>
+            </executions>
+            <configuration>
+               <repositoryId>ossrh</repositoryId>
+            </configuration>
          </plugin>
       </plugins>
    </build>
