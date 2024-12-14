@@ -4,7 +4,7 @@
 
    <groupId>org.netxms</groupId>
    <artifactId>swtchart</artifactId>
-   <version>1.3.8</version>
+   <version>1.3.9</version>
    <packaging>jar</packaging>
 
    <name>swtchart</name>
@@ -14,7 +14,7 @@
    <properties>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
       <lib.scope>provided</lib.scope>
-      <swt.version>3.126.0</swt.version>
+      <swt.version>3.128.0</swt.version>
    </properties>
 
    <licenses>

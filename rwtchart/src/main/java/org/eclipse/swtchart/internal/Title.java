@@ -321,13 +321,6 @@ public class Title implements ITitle, PaintListener {
 		 * context instead of drawing rotated image, the text shape becomes a
 		 * bit ugly especially with small font with bold.
 		 */
-		Image image = new Image(Display.getCurrent(), textWidth, textHeight);
-		GC tmpGc = new GC(image);
-		tmpGc.setBackground(chart.getBackground());
-		tmpGc.setForeground(getForeground());
-		tmpGc.setFont(getFont());
-		tmpGc.fillRectangle(image.getBounds());
-		tmpGc.drawText(text, 0, 0);
 		// set transform to rotate
 		Transform oldTransform = new Transform(gc.getDevice());
 		gc.getTransform(oldTransform);
@@ -338,12 +331,10 @@ public class Title implements ITitle, PaintListener {
 		// draw the image on the rotated graphics context
 		int x = getBounds().x;
 		int y = getBounds().y;
-		gc.drawImage(image, -y, x);
+		gc.drawText(text, -y, x);
 		gc.setTransform(oldTransform);
 		// dispose resources
 		oldTransform.dispose();
-		tmpGc.dispose();
 		transform.dispose();
-		image.dispose();
 	}
 }
