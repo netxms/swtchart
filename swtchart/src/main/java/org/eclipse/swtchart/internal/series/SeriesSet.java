@@ -525,6 +525,8 @@ public class SeriesSet implements ISeriesSet
             }
             else if (series.getType() == SeriesType.LINE)
             {
+               // Use separate stacks for inverted and normal series
+               // Both start from 0 but grow in opposite directions
                setStackSeries(series.isInverted() ? invertedStackLineSeries : stackLineSeries, series);
             }
          }
@@ -550,9 +552,7 @@ public class SeriesSet implements ISeriesSet
    {
       double[] ySeries = series.getYSeries();
       if (ySeries == null || stackSeries == null)
-      {
          return;
-      }
 
       for(int i = 0; i < stackSeries.length; i++)
       {
@@ -560,6 +560,8 @@ public class SeriesSet implements ISeriesSet
          {
             break;
          }
+         // Both normal and inverted series contribute positively to their respective stacks
+         // The visual inversion is handled during rendering, not in stack calculation
          stackSeries[i] = BigDecimal.valueOf(stackSeries[i]).add(BigDecimal.valueOf(ySeries[i])).doubleValue();
       }
       double[] copiedStackSeries = new double[stackSeries.length];

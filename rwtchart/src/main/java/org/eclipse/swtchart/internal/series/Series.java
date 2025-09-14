@@ -109,14 +109,12 @@ abstract public class Series<T> implements ISeries<T>
    @Override
    public String getId()
    {
-
       return id;
    }
 
    @Override
    public void setVisible(boolean visible)
    {
-
       if (this.visible == visible)
       {
          return;
@@ -128,7 +126,6 @@ abstract public class Series<T> implements ISeries<T>
    @Override
    public void setVisibleBuffered(boolean visible)
    {
-
       visibleBufferStatus = visible;
    }
 
@@ -204,6 +201,12 @@ abstract public class Series<T> implements ISeries<T>
          }
       }
       Range yRange = getYRange();
+      if (inverted)
+      {
+         double tmp = yRange.lower;
+         yRange.lower = -yRange.upper;
+         yRange.upper = -tmp;
+      }
       if (yRange.lower < 0)
       {
          IAxis axis = chart.getAxisSet().getYAxis(yAxisId);
@@ -376,7 +379,6 @@ abstract public class Series<T> implements ISeries<T>
     */
    public Range getYRange()
    {
-
       double min = 0;
       double max = 0;
       CartesianSeriesModel<T> dataModel = getDataModel();

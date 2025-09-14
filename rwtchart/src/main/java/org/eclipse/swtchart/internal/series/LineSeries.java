@@ -413,38 +413,55 @@ public class LineSeries<T> extends Series<T> implements ILineSeries<T>
       int x2 = xAxis.getPixelCoordinate(xseries[index + 1]);
       int x3 = x2;
       int x4 = x1;
-      int y1 = yAxis.getPixelCoordinate(inverted ? -yseries[index] : yseries[index]);
-      int y2 = yAxis.getPixelCoordinate(inverted ? -yseries[index + 1] : yseries[index + 1]);
-      int y3, y4;
+      int y1, y2, y3, y4;
 
       double baseYCoordinate = yAxis.getRange().lower > 0 ? yAxis.getRange().lower : 0;
 
       if (yAxis.isLogScaleEnabled())
       {
+         y1 = yAxis.getPixelCoordinate(inverted ? -yseries[index] : yseries[index]);
+         y2 = yAxis.getPixelCoordinate(inverted ? -yseries[index + 1] : yseries[index + 1]);
          y3 = yAxis.getPixelCoordinate(yAxis.getRange().lower);
          y4 = y3;
       }
       else if (isValidStackSeries())
       {
-         y1 = yAxis.getPixelCoordinate(inverted ? -stackSeries[indexes[index]] : stackSeries[indexes[index]]);
-         y2 = yAxis.getPixelCoordinate(inverted ? -stackSeries[indexes[index + 1]] : stackSeries[indexes[index + 1]]);
          if (inverted)
          {
-            y3 = yAxis.getPixelCoordinate(-stackSeries[indexes[index + 1]]) -
-                  Math.abs(yAxis.getPixelCoordinate(-yseries[index + 1]) - yAxis.getPixelCoordinate(0)) * (xAxis.isHorizontalAxis() ? 1 : -1);
-            y4 = yAxis.getPixelCoordinate(-stackSeries[indexes[index]]) - Math.abs(yAxis.getPixelCoordinate(-yseries[index]) - yAxis.getPixelCoordinate(0)) * (xAxis.isHorizontalAxis() ? 1 : -1);
+            // For inverted stacked series: grow downward from 0
+            // Stack values represent cumulative values growing away from 0
+            // Convert to negative coordinates for rendering below zero
+            y1 = yAxis.getPixelCoordinate(-stackSeries[indexes[index]]);
+            y2 = yAxis.getPixelCoordinate(-stackSeries[indexes[index + 1]]);
+
+            // Base is the previous stack level (also inverted)
+            double baseStack1 = stackSeries[indexes[index]] - yseries[index];
+            double baseStack2 = stackSeries[indexes[index + 1]] - yseries[index + 1];
+            y3 = yAxis.getPixelCoordinate(-baseStack2);
+            y4 = yAxis.getPixelCoordinate(-baseStack1);
          }
          else
          {
-            y3 = yAxis.getPixelCoordinate(stackSeries[indexes[index + 1]]) + Math.abs(yAxis.getPixelCoordinate(yseries[index + 1]) - yAxis.getPixelCoordinate(0)) * (xAxis.isHorizontalAxis() ? 1 : -1);
-            y4 = yAxis.getPixelCoordinate(stackSeries[indexes[index]]) + Math.abs(yAxis.getPixelCoordinate(yseries[index]) - yAxis.getPixelCoordinate(0)) * (xAxis.isHorizontalAxis() ? 1 : -1);
+            // For normal stacked series: grow upward from 0
+            y1 = yAxis.getPixelCoordinate(stackSeries[indexes[index]]);
+            y2 = yAxis.getPixelCoordinate(stackSeries[indexes[index + 1]]);
+
+            // Base is the previous stack level
+            double baseStack1 = stackSeries[indexes[index]] - yseries[index];
+            double baseStack2 = stackSeries[indexes[index + 1]] - yseries[index + 1];
+            y3 = yAxis.getPixelCoordinate(baseStack2);
+            y4 = yAxis.getPixelCoordinate(baseStack1);
          }
       }
       else
       {
+         // Non-stacked series
+         y1 = yAxis.getPixelCoordinate(inverted ? -yseries[index] : yseries[index]);
+         y2 = yAxis.getPixelCoordinate(inverted ? -yseries[index + 1] : yseries[index + 1]);
          y3 = yAxis.getPixelCoordinate(baseYCoordinate);
          y4 = y3;
       }
+
       if (xAxis.isHorizontalAxis())
       {
          return new int[] { x1, y1, x2, y2, x3, y3, x4, y4 };
@@ -771,7 +788,9 @@ public class LineSeries<T> extends Series<T> implements ILineSeries<T>
             xseries[i] = indexes[i];
             if (isValidStackSeries)
             {
-               yseries[i] = stackSeries[indexes[i]];
+               // For stacked series, use stack coordinates
+               // For inverted stacked series, negate the stack values for correct positioning
+               yseries[i] = inverted ? -stackSeries[indexes[i]] : stackSeries[indexes[i]];
             }
          }
       }
@@ -791,12 +810,15 @@ public class LineSeries<T> extends Series<T> implements ILineSeries<T>
          if (xAxis.isHorizontalAxis())
          {
             h = xAxis.getPixelCoordinate(xseries[i]);
-            v = yAxis.getPixelCoordinate(yseries[i]);
+            // For non-stacked inverted series, apply inversion here
+            double yValue = (isValidStackSeries() || !inverted) ? yseries[i] : -yseries[i];
+            v = yAxis.getPixelCoordinate(yValue);
          }
          else
          {
             v = xAxis.getPixelCoordinate(xseries[i]);
-            h = yAxis.getPixelCoordinate(yseries[i]);
+            double yValue = (isValidStackSeries() || !inverted) ? yseries[i] : -yseries[i];
+            h = yAxis.getPixelCoordinate(yValue);
          }
          if (getSymbolType() != PlotSymbolType.NONE)
          {
