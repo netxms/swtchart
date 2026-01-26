@@ -65,6 +65,8 @@ public class LineSeries<T> extends Series<T> implements ILineSeries<T>
    private boolean stepEnabled = false;
    /** the anti-aliasing value for drawing line */
    private int antialias = DEFAULT_ANTIALIAS;
+   /** the line gap threshold - max X interval for connecting points */
+   private double lineGapThreshold = Double.NaN;
    /** specific symbol */
    private String extendedSymbolType = "😂"; //$NON-NLS-1$
    /** the alpha value to draw area */
@@ -396,6 +398,41 @@ public class LineSeries<T> extends Series<T> implements ILineSeries<T>
       this.antialias = antialias;
    }
 
+   @Override
+   public double getLineGapThreshold()
+   {
+      return lineGapThreshold;
+   }
+
+   @Override
+   public void setLineGapThreshold(double threshold)
+   {
+      if (threshold < 0)
+      {
+         this.lineGapThreshold = Double.NaN;
+      }
+      else
+      {
+         this.lineGapThreshold = threshold;
+      }
+   }
+
+   /**
+    * Checks if the gap between two X values exceeds the threshold.
+    *
+    * @param x1 the first X value
+    * @param x2 the second X value
+    * @return true if gap exceeds threshold and line should not be drawn
+    */
+   private boolean exceedsGapThreshold(double x1, double x2)
+   {
+      if (Double.isNaN(lineGapThreshold))
+      {
+         return false;
+      }
+      return Math.abs(x2 - x1) > lineGapThreshold;
+   }
+
    /**
     * Gets the line points to draw line and area.
     *
@@ -527,6 +564,12 @@ public class LineSeries<T> extends Series<T> implements ILineSeries<T>
       {
          for(int i = 0; i < xseries.length - 1; i++)
          {
+            // Check gap threshold - skip drawing if gap exceeds threshold
+            if (exceedsGapThreshold(xseries[i], xseries[i + 1]))
+            {
+               continue;
+            }
+
             int[] p = getLinePoints(xseries, yseries, indexes, i, xAxis, yAxis);
             // draw line
             if (lineStyle != LineStyle.NONE)
@@ -593,6 +636,29 @@ public class LineSeries<T> extends Series<T> implements ILineSeries<T>
       {
          int x = xAxis.getPixelCoordinate(xseries[i + 1], xLower, xUpper);
          int y = yAxis.getPixelCoordinate(inverted ? -yseries[i + 1] : yseries[i + 1], yLower, yUpper);
+
+         // Check gap threshold
+         if (exceedsGapThreshold(xseries[i], xseries[i + 1]))
+         {
+            // Draw any pending vertical line before the gap
+            if (drawVerticalLine)
+            {
+               if (isHorizontal)
+               {
+                  gc.drawLine(prevX, verticalLineYLower, prevX, verticalLineYUpper);
+               }
+               else
+               {
+                  gc.drawLine(verticalLineYLower, prevX, verticalLineYUpper, prevX);
+               }
+               drawVerticalLine = false;
+            }
+            // Skip to the next point without drawing a line
+            prevX = x;
+            prevY = y;
+            continue;
+         }
+
          if (x == prevX && i < xseries.length - 2)
          {
             if (drawVerticalLine)
@@ -669,10 +735,42 @@ public class LineSeries<T> extends Series<T> implements ILineSeries<T>
       boolean drawVerticalLine = false;
       int verticalLineYLower = 0;
       int verticalLineYUpper = 0;
+      boolean advanced = gc.getAdvanced();
+      gc.setAdvanced(true); // workaround for eclipse bug #243588
       for(int i = 0; i < xseries.length - 1; i++)
       {
          int x = xAxis.getPixelCoordinate(xseries[i + 1], xLower, xUpper);
          int y = yAxis.getPixelCoordinate(inverted ? -yseries[i + 1] : yseries[i + 1], yLower, yUpper);
+
+         // Check gap threshold
+         if (exceedsGapThreshold(xseries[i], xseries[i + 1]))
+         {
+            // Draw any pending vertical line
+            if (drawVerticalLine)
+            {
+               addPoint(pointList, prevX, verticalLineYLower, isHorizontal);
+               addPoint(pointList, prevX, verticalLineYUpper, isHorizontal);
+               addPoint(pointList, prevX, prevY, isHorizontal);
+               drawVerticalLine = false;
+            }
+            // Draw current polyline segment if it has at least 2 points
+            if (pointList.size() >= 4)
+            {
+               int[] polyline = new int[pointList.size()];
+               for(int j = 0; j < polyline.length; j++)
+               {
+                  polyline[j] = pointList.get(j);
+               }
+               gc.drawPolyline(polyline);
+            }
+            // Start a new segment from the next point
+            pointList.clear();
+            addPoint(pointList, x, y, isHorizontal);
+            prevX = x;
+            prevY = y;
+            continue;
+         }
+
          if (x == prevX && i < xseries.length - 2)
          {
             if (drawVerticalLine)
@@ -705,14 +803,16 @@ public class LineSeries<T> extends Series<T> implements ILineSeries<T>
          prevX = x;
          prevY = y;
       }
-      int[] polyline = new int[pointList.size()];
-      for(int i = 0; i < polyline.length; i++)
+      // Draw final polyline segment
+      if (pointList.size() >= 4)
       {
-         polyline[i] = pointList.get(i);
+         int[] polyline = new int[pointList.size()];
+         for(int i = 0; i < polyline.length; i++)
+         {
+            polyline[i] = pointList.get(i);
+         }
+         gc.drawPolyline(polyline);
       }
-      boolean advanced = gc.getAdvanced();
-      gc.setAdvanced(true); // workaround
-      gc.drawPolyline(polyline);
       gc.setAdvanced(advanced);
    }
 

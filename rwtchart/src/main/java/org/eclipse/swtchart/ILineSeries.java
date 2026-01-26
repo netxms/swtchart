@@ -243,4 +243,31 @@ public interface ILineSeries<T> extends ISeries<T> {
 	 *            <code>SWT.ON</code> or <code>SWT.OFF</code>.
 	 */
 	void setAntialias(int antialias);
+
+	/**
+	 * Gets the line gap threshold. When the gap between two adjacent data points
+	 * on the X axis exceeds this threshold, no line is drawn between them.
+	 * This creates visible gaps in the chart when data is missing.
+	 *
+	 * @return the line gap threshold, or {@link Double#NaN} if no threshold is set
+	 *         (all points are connected regardless of gap)
+	 */
+	double getLineGapThreshold();
+
+	/**
+	 * Sets the line gap threshold. When the gap between two adjacent data points
+	 * on the X axis exceeds this threshold, no line is drawn between them.
+	 * This creates visible gaps in the chart when data is missing.
+	 * <p>
+	 * For example, if your X axis represents time in seconds and you set the
+	 * threshold to 60, any gap larger than 60 seconds between consecutive
+	 * data points will result in a visible gap on the chart instead of a
+	 * connecting line.
+	 *
+	 * @param threshold
+	 *            the maximum X interval for connecting points with a line.
+	 *            Use {@link Double#NaN} or a negative value to disable the
+	 *            threshold and connect all points.
+	 */
+	void setLineGapThreshold(double threshold);
 }
