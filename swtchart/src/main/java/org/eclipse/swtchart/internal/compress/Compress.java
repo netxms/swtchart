@@ -87,6 +87,12 @@ public abstract class Compress implements ICompress {
 	}
 
 	@Override
+	public double[] getOriginalXSeries() {
+
+		return xSeries;
+	}
+
+	@Override
 	public double[] getCompressedXSeries() {
 
 		double[] copiedSeries = new double[compressedXSeries.length];

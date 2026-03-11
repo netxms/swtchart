@@ -418,19 +418,32 @@ public class LineSeries<T> extends Series<T> implements ILineSeries<T>
    }
 
    /**
-    * Checks if the gap between two X values exceeds the threshold.
+    * Checks if there is a real data gap between two compressed data points
+    * by examining the original (uncompressed) X series data.
     *
-    * @param x1 the first X value
-    * @param x2 the second X value
-    * @return true if gap exceeds threshold and line should not be drawn
+    * @param originalIndex1 the original series index of the first compressed point
+    * @param originalIndex2 the original series index of the second compressed point
+    * @return true if any consecutive pair in the original data exceeds the gap threshold
     */
-   private boolean exceedsGapThreshold(double x1, double x2)
+   private boolean exceedsGapThreshold(int originalIndex1, int originalIndex2)
    {
       if (Double.isNaN(lineGapThreshold))
       {
          return false;
       }
-      return Math.abs(x2 - x1) > lineGapThreshold;
+      double[] originalXSeries = compressor.getOriginalXSeries();
+      if (originalXSeries == null)
+      {
+         return false;
+      }
+      for(int i = originalIndex1; i < originalIndex2; i++)
+      {
+         if (Math.abs(originalXSeries[i + 1] - originalXSeries[i]) > lineGapThreshold)
+         {
+            return true;
+         }
+      }
+      return false;
    }
 
    /**
@@ -565,7 +578,7 @@ public class LineSeries<T> extends Series<T> implements ILineSeries<T>
          for(int i = 0; i < xseries.length - 1; i++)
          {
             // Check gap threshold - skip drawing if gap exceeds threshold
-            if (exceedsGapThreshold(xseries[i], xseries[i + 1]))
+            if (exceedsGapThreshold(indexes[i], indexes[i + 1]))
             {
                continue;
             }
@@ -604,11 +617,11 @@ public class LineSeries<T> extends Series<T> implements ILineSeries<T>
       {
          if (lineStyle == LineStyle.SOLID)
          {
-            drawLine(gc, xAxis, yAxis, xseries, yseries, isHorizontal);
+            drawLine(gc, xAxis, yAxis, xseries, yseries, indexes, isHorizontal);
          }
          else if (lineStyle != LineStyle.NONE)
          {
-            drawLineWithStyle(gc, xAxis, yAxis, xseries, yseries, isHorizontal);
+            drawLineWithStyle(gc, xAxis, yAxis, xseries, yseries, indexes, isHorizontal);
          }
       }
 
@@ -621,7 +634,7 @@ public class LineSeries<T> extends Series<T> implements ILineSeries<T>
     * minimize the risk of side effect, this method remains for solid line style until that bug is fixed and the workaround is
     * removed.
     */
-   private void drawLine(GC gc, Axis xAxis, Axis yAxis, double[] xseries, double[] yseries, boolean isHorizontal)
+   private void drawLine(GC gc, Axis xAxis, Axis yAxis, double[] xseries, double[] yseries, int[] indexes, boolean isHorizontal)
    {
       double xLower = xAxis.getRange().lower;
       double xUpper = xAxis.getRange().upper;
@@ -637,8 +650,8 @@ public class LineSeries<T> extends Series<T> implements ILineSeries<T>
          int x = xAxis.getPixelCoordinate(xseries[i + 1], xLower, xUpper);
          int y = yAxis.getPixelCoordinate(inverted ? -yseries[i + 1] : yseries[i + 1], yLower, yUpper);
 
-         // Check gap threshold
-         if (exceedsGapThreshold(xseries[i], xseries[i + 1]))
+         // Check gap threshold using original data indices
+         if (exceedsGapThreshold(indexes[i], indexes[i + 1]))
          {
             // Draw any pending vertical line before the gap
             if (drawVerticalLine)
@@ -721,7 +734,7 @@ public class LineSeries<T> extends Series<T> implements ILineSeries<T>
     * @param yseries the y series
     * @param isHorizontal true if orientation is horizontal
     */
-   private void drawLineWithStyle(GC gc, Axis xAxis, Axis yAxis, double[] xseries, double[] yseries, boolean isHorizontal)
+   private void drawLineWithStyle(GC gc, Axis xAxis, Axis yAxis, double[] xseries, double[] yseries, int[] indexes, boolean isHorizontal)
    {
       double xLower = xAxis.getRange().lower;
       double xUpper = xAxis.getRange().upper;
@@ -742,8 +755,8 @@ public class LineSeries<T> extends Series<T> implements ILineSeries<T>
          int x = xAxis.getPixelCoordinate(xseries[i + 1], xLower, xUpper);
          int y = yAxis.getPixelCoordinate(inverted ? -yseries[i + 1] : yseries[i + 1], yLower, yUpper);
 
-         // Check gap threshold
-         if (exceedsGapThreshold(xseries[i], xseries[i + 1]))
+         // Check gap threshold using original data indices
+         if (exceedsGapThreshold(indexes[i], indexes[i + 1]))
          {
             // Draw any pending vertical line
             if (drawVerticalLine)

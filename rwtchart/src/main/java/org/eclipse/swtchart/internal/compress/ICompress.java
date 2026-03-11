@@ -55,8 +55,15 @@ public interface ICompress {
 	public abstract void setYSeries(double[] ySeries);
 
 	/**
+	 * Gets the original (uncompressed) X series.
+	 *
+	 * @return the original X series, or null if not set
+	 */
+	public abstract double[] getOriginalXSeries();
+
+	/**
 	 * Ignores the points which are in the same grid as the previous point.
-	 * 
+	 *
 	 * @param config
 	 *            the configuration for compression
 	 * @return true if the compression succeeds
