@@ -12,7 +12,7 @@ NetXMS fork of Eclipse SWTChart library (v1.3.10) - a Java charting library for 
 mvn clean package              # Build both modules
 mvn clean compile              # Compile only
 mvn javadoc:jar                # Generate JavaDoc
-./upload-to-sonatype.sh [ver]  # Deploy to Sonatype (requires GPG)
+mvn deploy -Pcentral           # Deploy to Maven Central
 ```
 
 **Platform profiles** (auto-activated based on OS):
