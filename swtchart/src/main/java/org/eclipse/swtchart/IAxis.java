@@ -256,4 +256,14 @@ public interface IAxis {
     * @param useMultipliers the useMultipliers to set
     */
    public void setUseMultipliers(boolean useMultipliers);
+
+   /**
+    * @return true if binary (IEC) multipliers should be used
+    */
+   public boolean isUseBinaryMultipliers();
+
+   /**
+    * @param useBinaryMultipliers set to use binary (IEC) multipliers (Ki, Mi, Gi) instead of decimal (k, M, G)
+    */
+   public void setUseBinaryMultipliers(boolean useBinaryMultipliers);
 }

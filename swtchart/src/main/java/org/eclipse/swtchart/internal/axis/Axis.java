@@ -88,6 +88,8 @@ public class Axis implements IAxis
 	private int height;
    /** enable or disable multipliers */
    private boolean useMultipliers = true;
+   /** use binary (IEC) multipliers instead of decimal */
+   private boolean useBinaryMultipliers = false;
 	/** the list of dispose listeners */
 	private List<IDisposeListener> listeners;
 
@@ -808,5 +810,17 @@ public class Axis implements IAxis
    public void setUseMultipliers(boolean useMultipliers)
    {
       this.useMultipliers = useMultipliers;
+   }
+
+   @Override
+   public boolean isUseBinaryMultipliers()
+   {
+      return useBinaryMultipliers;
+   }
+
+   @Override
+   public void setUseBinaryMultipliers(boolean useBinaryMultipliers)
+   {
+      this.useBinaryMultipliers = useBinaryMultipliers;
    }
 }

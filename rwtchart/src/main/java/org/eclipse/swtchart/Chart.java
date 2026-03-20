@@ -526,10 +526,20 @@ public class Chart extends Canvas implements Listener {
    public void setUseMultipliers(boolean useMultipliers)
    {
       this.useMultipliers = useMultipliers;
-      
+
       IAxisSet axisSet = getAxisSet();
       IAxis yAxis = axisSet.getYAxis(0);
       yAxis.setUseMultipliers(useMultipliers);
+   }
+
+   /**
+    * @param useBinaryMultipliers set to use binary (IEC) multipliers on Y axis
+    */
+   public void setUseBinaryMultipliers(boolean useBinaryMultipliers)
+   {
+      IAxisSet axisSet = getAxisSet();
+      IAxis yAxis = axisSet.getYAxis(0);
+      yAxis.setUseBinaryMultipliers(useBinaryMultipliers);
    }
    
    /**

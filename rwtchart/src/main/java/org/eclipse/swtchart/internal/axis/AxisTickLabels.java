@@ -416,7 +416,7 @@ public class AxisTickLabels implements PaintListener
 		if (format == null)
 		{
 			if (axis.isUseMultipliers())
-			   return roundDecimalValue((Double)obj, tickStep, 5);
+			   return roundDecimalValue((Double)obj, tickStep, 5, axis.isUseBinaryMultipliers());
 			else
 			   return new DecimalFormat(DEFAULT_DECIMAL_FORMAT).format(obj);
 		}
@@ -621,6 +621,22 @@ public class AxisTickLabels implements PaintListener
 		 */
 		double length = Math.abs(max - min);
 		double gridStepHint = length / lengthInPixels * axis.getTick().getTickMarkStepHint();
+
+		// For binary multipliers, compute step in binary units for round labels
+		if (axis.isUseBinaryMultipliers())
+		{
+		   double binaryMultiplier = getBinaryMultiplier(Math.max(Math.abs(min), Math.abs(max)));
+		   double hintInUnits = gridStepHint / binaryMultiplier;
+		   BigDecimal unitStep = getDecimalRoundStep(hintInUnits);
+		   BigDecimal gridStep = unitStep.multiply(BigDecimal.valueOf(binaryMultiplier));
+
+		   if (axis.isIntegerDataPointAxis())
+		   {
+		      gridStep = applyIntegerDataPointAdjustment(gridStep);
+		   }
+		   return gridStep;
+		}
+
 		// gridStepHint --> mantissa * 10 ** exponent
 		// e.g. 724.1 --> 7.241 * 10 ** 2
 		double mantissa = gridStepHint;
@@ -670,28 +686,86 @@ public class AxisTickLabels implements PaintListener
 		 */
       if (axis.isIntegerDataPointAxis())
       {
-         for(ISeries series : (ISeries[])chart.getSeriesSet().getSeries())
-         {
-            if (axis.getDirection() == Direction.X)
-            {
-               if (series.getXAxisId() == axis.getId() && series.getXSeries().length != 0)
-               {
-                  int xSeriesLength = series.getXSeries().length;
-                  double upper = series.getXSeries()[xSeriesLength - 1], lower = series.getXSeries()[0];
-                  gridStep = BigDecimal.valueOf((upper - lower) / (xSeriesLength - 1));
-               }
-            }
-            else
-            {
-               if (series.getYAxisId() == axis.getId() && series.getYSeries().length != 0)
-               {
-                  gridStep = BigDecimal.valueOf(1.0);
-               }
-            }
-         }
+         gridStep = applyIntegerDataPointAdjustment(gridStep);
       }
 
 		return gridStep;
+	}
+
+	/**
+	 * Get a decimal-round step value (1, 2, 5, or 10 * 10^n) that is >= hint.
+	 */
+	private BigDecimal getDecimalRoundStep(double hint)
+	{
+	   double mantissa = hint;
+	   int exponent = 0;
+	   if (mantissa < 1)
+	   {
+	      while(mantissa < 1)
+	      {
+	         mantissa *= 10.0;
+	         exponent--;
+	      }
+	   }
+	   else
+	   {
+	      while(mantissa >= 10)
+	      {
+	         mantissa /= 10.0;
+	         exponent++;
+	      }
+	   }
+
+	   if (mantissa > 7.5)
+	      return BigDecimal.TEN.multiply(pow(10, exponent));
+	   else if (mantissa > 3.5)
+	      return BigDecimal.valueOf(5).multiply(pow(10, exponent));
+	   else if (mantissa > 1.5)
+	      return BigDecimal.valueOf(2).multiply(pow(10, exponent));
+	   else
+	      return pow(10, exponent);
+	}
+
+	/**
+	 * Get binary multiplier bracket for given value (1, 1024, 1048576, etc.)
+	 */
+	private static double getBinaryMultiplier(double value)
+	{
+	   double absValue = Math.abs(value);
+	   long[] multipliers = { 0x4000000000000L, 0x10000000000L, 0x40000000L, 0x100000L, 0x400L, 1L };
+	   for(long m : multipliers)
+	   {
+	      if (absValue >= m)
+	         return m;
+	   }
+	   return 1;
+	}
+
+	/**
+	 * Apply integer data point axis adjustment to grid step.
+	 */
+	private BigDecimal applyIntegerDataPointAdjustment(BigDecimal gridStep)
+	{
+      for(ISeries series : (ISeries[])chart.getSeriesSet().getSeries())
+      {
+         if (axis.getDirection() == Direction.X)
+         {
+            if (series.getXAxisId() == axis.getId() && series.getXSeries().length != 0)
+            {
+               int xSeriesLength = series.getXSeries().length;
+               double upper = series.getXSeries()[xSeriesLength - 1], lower = series.getXSeries()[0];
+               gridStep = BigDecimal.valueOf((upper - lower) / (xSeriesLength - 1));
+            }
+         }
+         else
+         {
+            if (series.getYAxisId() == axis.getId() && series.getYSeries().length != 0)
+            {
+               gridStep = BigDecimal.valueOf(1.0);
+            }
+         }
+      }
+      return gridStep;
 	}
 
 	/**
@@ -991,11 +1065,26 @@ public class AxisTickLabels implements PaintListener
     */
    public static String roundDecimalValue(double value, double step, int maxPrecision)
    {
+      return roundDecimalValue(value, step, maxPrecision, false);
+   }
+
+   /**
+    * Get rounded value for chart labels
+    *
+    * @param value to round
+    * @param step of label
+    * @param maxPrecision desired precision
+    * @param useBinary use binary (IEC) multipliers instead of decimal
+    * @return rounded value
+    */
+   public static String roundDecimalValue(double value, double step, int maxPrecision, boolean useBinary)
+   {
       if (value == 0)
          return "0";
 
       double absValue = Math.abs(value);
-      final long[] multipliers = DECIMAL_MULTIPLIERS;
+      final long[] multipliers = useBinary ? BINARY_MULTIPLIERS : DECIMAL_MULTIPLIERS;
+      final String[] suffixes = useBinary ? BINARY_SUFFIXES : DECIMAL_SUFFIXES;
 
       int i;
       for(i = multipliers.length - 1; i >= 0; i--)
@@ -1012,6 +1101,6 @@ public class AxisTickLabels implements PaintListener
 
       DecimalFormat df = new DecimalFormat();
       df.setMaximumFractionDigits(precision);
-      return df.format((i < 0 ? value : (value / multipliers[i]))) + (i < 0 ? "" : DECIMAL_SUFFIXES[i]);
+      return df.format((i < 0 ? value : (value / multipliers[i]))) + (i < 0 ? "" : suffixes[i]);
    }
 }

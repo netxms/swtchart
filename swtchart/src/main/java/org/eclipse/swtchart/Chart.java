@@ -16,7 +16,6 @@ package org.eclipse.swtchart;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
@@ -540,10 +539,20 @@ public class Chart extends Composite implements Listener {
    public void setUseMultipliers(boolean useMultipliers)
    {
       this.useMultipliers = useMultipliers;
-      
+
       IAxisSet axisSet = getAxisSet();
       IAxis yAxis = axisSet.getYAxis(0);
       yAxis.setUseMultipliers(useMultipliers);
+   }
+
+   /**
+    * @param useBinaryMultipliers set to use binary (IEC) multipliers on Y axis
+    */
+   public void setUseBinaryMultipliers(boolean useBinaryMultipliers)
+   {
+      IAxisSet axisSet = getAxisSet();
+      IAxis yAxis = axisSet.getYAxis(0);
+      yAxis.setUseBinaryMultipliers(useBinaryMultipliers);
    }
    
    /**
